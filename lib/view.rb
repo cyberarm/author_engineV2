@@ -4,6 +4,14 @@ class AuthorEngine
 
     def initialize(x:, y:, width:, height:, background: Gosu::Color::BLACK)
       @x, @y, @width, @height, @background = x, y, width, height, background
+
+      setup
+    end
+
+    def setup
+    end
+
+    def focus
     end
 
     def draw

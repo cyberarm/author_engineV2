@@ -6,13 +6,15 @@ class AuthorEngine
 
     attr_reader :label, :text, :block, :image, :width, :height, :x, :y
     attr_accessor :z
-    def initialize(label: nil, image: nil, x: 0, y: 0, z: 0, color: Gosu::Color::GREEN, &block)
+    def initialize(label: nil, tooltip: nil, image: nil, x: 0, y: 0, z: 0, color: Gosu::Color::GREEN, &block)
       @label, @image = label, image
       @x, @y, @z = x, y, z
       @color = color
       @block = block
 
       @width, @height = 0, 0
+      @x_padding = PADDING * window.scale_x
+      @y_padding = PADDING * window.scale_y
 
       if @label.is_a?(String)
         @text = AuthorEngine::Text.new(message: @label, x: @x, y: @y, z: @z)
@@ -24,6 +26,10 @@ class AuthorEngine
 
       set_interactive_colors
       position_elements
+
+      if tooltip.is_a?(String)
+        @tooltip = AuthorEngine::Text.new(message: tooltip, x: @x, y: @y+@height, z: 1000)
+      end
 
       return self
     end
@@ -37,6 +43,8 @@ class AuthorEngine
         draw_background(@color)
       end
       draw_element
+
+      draw_tooltip if @tooltip && mouse_over?
     end
 
     def button_up(id)
@@ -89,27 +97,42 @@ class AuthorEngine
         @image.draw
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @image.draw(@x+PADDING, @y+PADDING, @z)
+        @image.draw(@x+@x_padding, @y+@y_padding, @z)
 
       else
         raise "Nothing to draw! (text and image were nil or invalid types)"
       end
     end
 
+    def draw_tooltip
+      Gosu.draw_rect(@tooltip.x-@x_padding, @tooltip.y-@y_padding, @tooltip.width+(@x_padding*2), @tooltip.height+(@y_padding*2), Gosu::Color.rgba(0,0,0, 200), @tooltip.z)
+      @tooltip.draw
+    end
+
     def position_elements
       if @text && @text.is_a?(AuthorEngine::Text)
-        @text.x, @text.y = @x+PADDING, @y+PADDING
-        @width, @height = @text.width+PADDING, @text.height+PADDING
+        @text.x, @text.y = @x+@x_padding, @y+@y_padding
+        @width, @height = @text.width+(@x_padding*2), @text.height+(@y_padding*2)
 
       elsif @image && @image.is_a?(AuthorEngine::Sprite)
-        @image.x, @image.y = @x+PADDING, @y+PADDING
-        @width, @height = @image.width+PADDING, @image.height+PADDING
+        @image.x, @image.y = @x+@x_padding, @y+@y_padding
+        @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @width, @height = @image.width+PADDING, @image.height+PADDING
+        @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
 
       else
         raise "From Button -> text and image were nil or invalid types"
+      end
+
+      if @tooltip
+        if (@x + @tooltip.width + @x_padding) > window.width
+          @tooltip.x = @x - (((@x+@tooltip.width) - window.width) + @x_padding)
+        else
+          @tooltip.x = @x
+        end
+
+        @tooltip.y = (@y + @height + @y_padding)
       end
     end
 

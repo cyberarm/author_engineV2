@@ -3,27 +3,33 @@ class AuthorEngine
     include Support
 
     def initialize
+      @scale_x = window.scale_x
+      @scale_y = window.scale_y
+
       @active_view  = nil
-      @header_height= 10
+      @header_height= (10 * @scale_y)
       @header_color = Gosu::Color.rgba(25, 255, 25, 100)
+      @title = Text.new(message: "AuthorEngine", x: (1*@scale_x), y: (1*@scale_y))
       @views = []
       @buttons = []
       add_buttons
     end
 
     def add_buttons
-      v = View.new(x: 0, y: @header_height, width: window.width, height: window.height-@header_height, background: Gosu::Color::GREEN)
-      @buttons << Button.new(label: "Play",  color: @header_color) {@active_view = v}
+      @play_viewer = View.new(x: 0, y: @header_height+(@scale_y*2), width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 100))
+      @buttons << Button.new(label: "►", tooltip: "Play", color: @header_color) {@active_view = @play_viewer}
 
-      vi = View.new(x: 0, y: @header_height, width: window.width, height: window.height-@header_height, background: Gosu::Color::BLUE)
-      @buttons << Button.new(label: "Sprite",color: @header_color) {@active_view = vi}
+      @sprite_editor = SpriteEditor.new(x: 0, y: @header_height+(@scale_y*2), width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 100, 150))
+      @buttons << Button.new(label: "☃", tooltip: "Sprite Editor", color: @header_color) {@active_view = @sprite_editor; window.show_cursor = true}
 
-      vie = View.new(x: 0, y: @header_height, width: window.width, height: window.height-@header_height, background: Gosu::Color::RED)
-      @buttons << Button.new(label: "Map",   color: @header_color) {@active_view = vie}
+      @level_editor = View.new(x: 0, y: @header_height+(@scale_y*2), width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(150, 100, 100))
+      @buttons << Button.new(label: "░", tooltip: "Level Editor", color: @header_color) {@active_view = @level_editor}
 
-      view = View.new(x: 0, y: @header_height, width: window.width, height: window.height-@header_height, background: Gosu::Color::YELLOW)
-      @buttons << Button.new(label: "Code",  color: @header_color) {@active_view = view}
+      @code_editor = View.new(x: 0, y: @header_height+(@scale_y*2), width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 150))
+      @buttons << Button.new(label: "❞", tooltip: "Code Editor", color: @header_color) {@active_view = @code_editor}
 
+      @active_view = @play_viewer
+      @active_view.focus
       position_buttons
     end
 
@@ -45,6 +51,7 @@ class AuthorEngine
 
     def draw
       Gosu.draw_rect(0, 0, window.width, @header_height, @header_color)
+      @title.draw
       @buttons.each(&:draw)
 
       @active_view.draw if @active_view
@@ -57,7 +64,7 @@ class AuthorEngine
     def button_up(id)
       @buttons.each {|b| b.button_up(id)}
 
-      @active_view.button_up(id)
+      @active_view.button_up(id) if @active_view
     end
   end
 end
