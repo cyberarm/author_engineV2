@@ -11,13 +11,21 @@ class AuthorEngine
 
     DEFAULT_STRING = <<-EOF
 def init
+  @x = 0
+  @y = 0
+
+  puts "#{@x}/#{@y}"
 end
 
 def draw
-  rect(10, 10, 10, 10)
+  rect(@x, @y, 10, 10)
 end
 
 def update
+  @x+=1 if button?("right")
+  @x-=1 if button?("left")
+  @y-=1 if button?("up")
+  @y+=1 if button?("down")
 end
     EOF
 

@@ -60,6 +60,12 @@ class AuthorEngine
       text.message = message
     end
 
+    def focus
+      if Gosu.milliseconds > 100
+        play
+      end
+    end
+
     def play
       catch_error do
         run(code: code_editor.code)

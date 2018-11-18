@@ -11,6 +11,7 @@ require_relative "lib/palette"
 
 require_relative "lib/game/parts/graphics"
 require_relative "lib/game/parts/colors"
+require_relative "lib/game/parts/input"
 require_relative "lib/game/game"
 
 require_relative "lib/views/play_viewer"
