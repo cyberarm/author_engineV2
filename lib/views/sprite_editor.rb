@@ -33,7 +33,7 @@ class AuthorEngine
 
     def focus
       window.show_cursor = true
-      window.caption = "Painter"
+      window.caption = "Sprite Editor"
     end
 
     def draw

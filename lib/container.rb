@@ -22,17 +22,15 @@ class AuthorEngine
     end
 
     def add_buttons
-      @play_viewer = PlayViewer.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 100))
-      @buttons << Button.new(image: "assets/ui/play_icon.png", tooltip: "Play", tag: :play_viewer, color: @header_color) {@active_view = @play_viewer; @active_view.focus}
-
+      @play_viewer   = PlayViewer.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 100))
       @sprite_editor = SpriteEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 100, 150))
-      @buttons << Button.new(image: "assets/ui/sprite_icon.png", tooltip: "Sprite Editor", tag: :sprite_editor, color: @header_color) {@active_view = @sprite_editor; @active_view.focus}
+      @level_editor  = LevelEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(150, 100, 100))
+      @code_editor   = CodeEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 150))
 
-      @level_editor = LevelEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(150, 100, 100))
-      @buttons << Button.new(image: "assets/ui/level_icon.png", tooltip: "Level Editor", tag: :level_editor, color: @header_color) {@active_view = @level_editor; @active_view.focus}
-
-      @code_editor = CodeEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 150))
-      @buttons << Button.new(image: "assets/ui/code_icon.png", tooltip: "Code Editor", tag: :code_editor, color: @header_color) {@active_view = @code_editor; @active_view.focus}
+      @buttons << Button.new(image: "assets/ui/play_icon.png", tooltip: "Play", tag: :play_viewer, color: @header_color) {@active_view = @play_viewer; @active_view.focus; @code_editor.blur}
+      @buttons << Button.new(image: "assets/ui/sprite_icon.png", tooltip: "Sprite Editor", tag: :sprite_editor, color: @header_color) {@active_view = @sprite_editor; @active_view.focus; @code_editor.blur}
+      @buttons << Button.new(image: "assets/ui/level_icon.png", tooltip: "Level Editor", tag: :level_editor, color: @header_color) {@active_view = @level_editor; @active_view.focus; @code_editor.blur}
+      @buttons << Button.new(image: "assets/ui/code_icon.png", tooltip: "Code Editor", tag: :code_editor, color: @header_color) {@active_view = @code_editor; @active_view.focus; @code_editor.blur}
 
       @active_view = @play_viewer
       @active_view.focus

@@ -61,6 +61,7 @@ class AuthorEngine
     end
 
     def focus
+      window.caption = "Play"
       if Gosu.milliseconds > 100
         play
       end
@@ -116,9 +117,10 @@ class AuthorEngine
         x_offset = window.width / 2 - (window.width * ratio * window.square_scale) / 2
       end
 
-      Gosu.translate(x_offset, 0) do
-        Gosu.scale(window.square_scale, window.square_scale) do
-          Gosu.clip_to(0, 0, window.base_size * window.square_scale, window.base_size * window.square_scale) do
+      # FIXME: missing ~10 pixels from both width and height...
+      Gosu.clip_to(x_offset, 0, (window.base_size * window.square_scale), (window.base_size * window.square_scale)) do
+        Gosu.translate(x_offset, 0) do
+          Gosu.scale(window.square_scale, window.square_scale) do
             @game.draw_background
             @game.draw
           end
