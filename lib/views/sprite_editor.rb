@@ -47,6 +47,8 @@ class AuthorEngine
 
     def update
       super
+      paint if Gosu.button_down?(Gosu::MsLeft)
+      erase if Gosu.button_down?(Gosu::MsRight)
       @palette.update
     end
 

@@ -1,6 +1,7 @@
 class AuthorEngine
   class Palette
     include Support
+    include AuthorEngine::Part::Colors
 
     def initialize(x:, y:, size: 8)
       @x_padding = window.scale_x
@@ -13,28 +14,28 @@ class AuthorEngine
 
       @color_set = [
         [
-          Gosu::Color.rgb(0,0,0),
-          Gosu::Color.rgb(29, 43, 83),
-          Gosu::Color.rgb(126, 37, 83),
-          Gosu::Color.rgb(0, 135, 81)
+          black,
+          dark_blue,
+          dark_purple,
+          dark_green
         ],
         [
-          Gosu::Color.rgb(171, 82, 54),
-          Gosu::Color.rgb(95, 87, 79),
-          Gosu::Color.rgb(194, 195, 199),
-          Gosu::Color.rgb(255, 241, 232)
+          brown,
+          dark_gray,
+          light_gray,
+          white
         ],
         [
-          Gosu::Color.rgb(255, 0, 77),
-          Gosu::Color.rgb(255, 163, 0),
-          Gosu::Color.rgb(225, 236, 39),
-          Gosu::Color.rgb(0, 228, 54)
+          red,
+          orange,
+          yellow,
+          green
         ],
         [
-          Gosu::Color.rgb(41, 173, 255),
-          Gosu::Color.rgb(131, 118, 156),
-          Gosu::Color.rgb(225, 119, 168),
-          Gosu::Color.rgb(255, 204, 170)
+          blue,
+          indigo,
+          pink,
+          peach
         ]
       ]
       @active_set = 0
@@ -57,9 +58,12 @@ class AuthorEngine
       end
 
       @x, @y = _x, _y
+      @width  = 4 * @size
+      @height = 4 * @size
     end
 
     def draw
+      Gosu.draw_rect(@x-@x_padding, @y-@y_padding, @width + (@x_padding*2), @height + (@y_padding*2), light_gray)
       draw_colors
       hightlight_active_color
     end
@@ -100,7 +104,6 @@ class AuthorEngine
         row.each_with_index do |color, x|
           if color == @active_color
             Gosu.draw_rect(@x+(x*@size)-@x_padding, (@y+(@size*i))-@y_padding, @size+(@x_padding*2), @size+(@y_padding*2), Gosu::Color.rgba(255,255,255, 200), 8)
-            # Gosu.draw_rect(@x+(x*@size), @y, @size, @size, Gosu::Color.rgba(255,255,255, 100))
             break
           end
         end

@@ -1,13 +1,12 @@
 class AuthorEngine
   class CodeEditor < View
+    include AuthorEngine::Part::Colors
+
     class CodeInput < Gosu::TextInput
       def filter(text_in)
         return text_in
       end
     end
-
-    VARAIBLE = Gosu::Color::GREEN
-    DEFINIION = 800
 
     DEFAULT_STRING = <<-EOF
 def init
@@ -30,11 +29,27 @@ end
 
 
     def setup
+      @highlight_colors = {
+        instance_variable: xml_color(green),
+        keyword: xml_color(red),
+        method: xml_color(yellow),
+        ident: xml_color(yellow),
+        comment: xml_color(dark_gray),
+        constant: xml_color(black),
+
+        delimiter: xml_color(blue),
+        content: xml_color(blue),
+
+        integer: xml_color(blue),
+        float: xml_color(blue),
+      }
+
       @text_input = CodeInput.new
       @text_input.text = DEFAULT_STRING
-      @text = AuthorEngine::Text.new(message: "", x: 9 * window.scale_y, y: window.container.header_height)
+      @font_size = 6 * window.square_scale.floor
+      @text = AuthorEngine::Text.new(message: "", size: @font_size, x: 9 * window.scale_y, y: window.container.header_height, font: "DejaVu Sans Mono")
 
-      @font  = Gosu::Font.new((8 * window.scale_y).floor, name: "Consolas")
+      @font  = Gosu::Font.new(@font_size, name: "Consolas")
       @cursor_last_blink = Gosu.milliseconds
       @cursor_blink_interval = 250
       @show_cursor = false
@@ -58,7 +73,7 @@ end
       super
       Gosu.clip_to(0, window.container.header_height, window.width, window.height - window.container.header_height) do
         Gosu.translate(0, @y_offset) do
-          Gosu.draw_rect(0, window.container.header_height, 8 * window.scale_y, Float::INFINITY, Gosu::Color::GRAY)
+          Gosu.draw_rect(0, window.container.header_height, 8 * window.scale_y, Float::INFINITY, black)
 
           (@text.message.lines.map(&:chomp)).each_with_index do |line, index|
             @font.draw_text("#{index+1}", 1, window.container.header_height + (@font.height * index), 0)
@@ -87,7 +102,7 @@ end
     end
 
     def make_cursor_visible
-      @y_offset = @height - (@text.y + (@active_line * @text.height))
+      @y_offset = @height - ((@text.y - (window.container.header_height - @text.height)) + (@active_line * @text.height))
       @y_offset = 0 if @y_offset > 0
     end
 
@@ -123,17 +138,39 @@ end
         substring2= substring.sub(string,  "")
         substring3= substring.sub(substring2, "")
 
-        x = @font.text_width(substring3)
+        x = @text.font.markup_width(substring3)
       else
-        x = @font.text_width((@text_input.text.lines.map(&:chomp))[@active_line])
+        x = @text.font.markup_width((@text_input.text.lines.map(&:chomp))[@active_line])
       end
 
-      Gosu.draw_rect(@text.x + x, @text.y + (@active_line * @text.height), 1, @text.height, Gosu::Color::BLACK)
+      if x + window.square_scale > @width - @text.x
+        @x_offset = (@width - @text.x) - (x + window.square_scale)
+      else
+        @x_offset = 0
+      end
+
+
+      Gosu.draw_rect(@text.x + x, @text.y + (@active_line * @text.height), 1, @text.height, light_gray)
     end
 
     def highlight_text
-      @text.message.gsub!("def ", "<c=#{DEFINIION}>def </c>")
-      @text.message.gsub!("end\n", "<c=#{DEFINIION}>end</c>\n")
+      text = ""
+
+      tokens = CodeRay.scan(@text_input.text, :ruby).tokens
+      tokens.each_with_index do |token, index|
+        text = "#{text}#{style(token, tokens[index+1])}" if token.is_a?(String)
+      end
+
+      @text.message = text
+    end
+
+    def style(text, token)
+      color = @highlight_colors.dig(token)
+      if color
+        return "<c=#{color}>#{text}</c>"
+      else
+        return text
+      end
     end
 
     def highlight_line

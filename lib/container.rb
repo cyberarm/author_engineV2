@@ -1,6 +1,7 @@
 class AuthorEngine
   class Container
     include Support
+    include AuthorEngine::Part::Colors
 
     attr_reader :header_height
     def initialize
@@ -9,7 +10,7 @@ class AuthorEngine
 
       @active_view  = nil
       @header_height= (16 * @scale_y)+(@scale_y*2)
-      @header_color = Gosu::Color.rgba(25, 255, 25, 100)
+      @header_color = Gosu::Color.rgba(dark_green.red, dark_green.green, dark_green.blue, 100)#Gosu::Color.rgba(25, 255, 25, 100)
       @title = Text.new(message: "AuthorEngine", x: (1*@scale_x), y: (1*@scale_y))
       @views = []
       @buttons = []
@@ -22,10 +23,10 @@ class AuthorEngine
     end
 
     def add_buttons
-      @play_viewer   = PlayViewer.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 100))
-      @sprite_editor = SpriteEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 100, 150))
-      @level_editor  = LevelEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(150, 100, 100))
-      @code_editor   = CodeEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: Gosu::Color.rgb(100, 150, 150))
+      @play_viewer   = PlayViewer.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: dark_purple)
+      @sprite_editor = SpriteEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: indigo)
+      @level_editor  = LevelEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: brown)
+      @code_editor   = CodeEditor.new(x: 0, y: @header_height+1, width: window.width, height: window.height-@header_height, background: black)
 
       @buttons << Button.new(image: "assets/ui/play_icon.png", tooltip: "Play", tag: :play_viewer, color: @header_color) {@active_view = @play_viewer; @active_view.focus; @code_editor.blur}
       @buttons << Button.new(image: "assets/ui/sprite_icon.png", tooltip: "Sprite Editor", tag: :sprite_editor, color: @header_color) {@active_view = @sprite_editor; @active_view.focus; @code_editor.blur}

@@ -117,7 +117,6 @@ class AuthorEngine
         x_offset = window.width / 2 - (window.width * ratio * window.square_scale) / 2
       end
 
-      # FIXME: missing ~10 pixels from both width and height...
       Gosu.clip_to(x_offset, 0, (window.base_size * window.square_scale), (window.base_size * window.square_scale)) do
         Gosu.translate(x_offset, 0) do
           Gosu.scale(window.square_scale, window.square_scale) do

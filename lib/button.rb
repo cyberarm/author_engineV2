@@ -6,7 +6,7 @@ class AuthorEngine
 
     attr_reader :label, :text, :block, :image, :width, :height, :x, :y, :tag
     attr_accessor :z
-    def initialize(label: nil, tooltip: nil, image: nil, x: 0, y: 0, z: 0, color: Gosu::Color::GREEN, tag: nil, &block)
+    def initialize(label: nil, tooltip: nil, image: nil, x: 0, y: 0, z: 0, color:, tag: nil, &block)
       @label, @image = label, image
       @x, @y, @z = x, y, z
       @color = color
