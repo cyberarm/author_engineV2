@@ -22,7 +22,13 @@ class AuthorEngine
       @active_color = Gosu::Color.rgba(101,1,101, 255)
 
       create_grid(16, 16, 4)
-      @palette = Palette.new(:center, :bottom)
+      @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
+      @sprites = SpritePicker.new(
+        x: 8 * window.scale_x,
+        y: @grid_y + @grid_height + (@grid_pixel_size * 2),
+        width: window.width - (16 * window.scale_x),
+        height: 32 * window.scale_y
+      )
     end
 
     def focus
@@ -36,6 +42,7 @@ class AuthorEngine
       highlight_pixel
 
       @palette.draw
+      @sprites.draw
     end
 
     def update
@@ -46,13 +53,16 @@ class AuthorEngine
     def create_grid(x, y, size)
       size = size * window.scale_y
 
-      x_offset = window.width/2 - (x*size)/2
-      y_offset = window.height/2 - (y*size)/2
+      @grid_x = (window.width / 2) - (((size * x) / 2) + size*2 )
+      @grid_y = window.container.header_height + size
+      @grid_width = x * size
+      @grid_height = y * size
+      @grid_pixel_size = size
 
       y.times do |_y|
         x.times do |_x|
           @pixels << Pixel.new(
-            x_offset+(_x*size), y_offset+(_y*size),
+            @grid_x+(_x*size), @grid_y+(_y*size),
             size, size,
             MAGIC_BLANK_COLOR
           )

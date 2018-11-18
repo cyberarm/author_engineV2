@@ -11,18 +11,21 @@ class AuthorEngine
     VIEW_WIDTH, VIEW_HEIGHT = 128.0, 128.0
 
     attr_accessor :show_cursor
-    attr_reader :scale_x, :scale_y, :container
+    attr_reader :scale_x, :scale_y, :square_scale, :container
     def initialize
-      # super(128,128, fullscreen: false)
-      super(256, 256, fullscreen: true)
+      super(128,128, fullscreen: true)
+      # super(256, 256, fullscreen: true)
       # super(1280, 800, fullscreen: false)
-      # super(Gosu.screen_width, Gosu.screen_height, fullscreen: true)
+      super(Gosu.screen_width, Gosu.screen_height, fullscreen: true) if ARGV.join.include?("--native")
 
       Window.instance = self
       @container = nil
       @show_cursor = true
       @scale_x = 1.0
       @scale_y = 1.0
+      @square_scale = 1.0
+
+      @close_counter = 0
 
       calculate_scale
       setup
@@ -30,6 +33,7 @@ class AuthorEngine
 
     def setup
       @container = Container.new
+      @container.setup
     end
 
     def calculate_scale
@@ -37,6 +41,8 @@ class AuthorEngine
 
       @scale_x = (self.width  / VIEW_WIDTH)
       @scale_y = (self.height / VIEW_HEIGHT)
+
+      @square_scale = @scale_y
     end
 
     def draw
@@ -52,7 +58,12 @@ class AuthorEngine
     end
 
     def button_up(id)
-      close if id == Gosu::KbEscape
+      if id == Gosu::KbEscape
+        @close_counter += 1
+        close if @close_counter == 2
+      else
+        @close_counter = 0
+      end
 
       @container.button_up(id)
     end

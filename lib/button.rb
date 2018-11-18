@@ -4,12 +4,13 @@ class AuthorEngine
 
     PADDING = 2
 
-    attr_reader :label, :text, :block, :image, :width, :height, :x, :y
+    attr_reader :label, :text, :block, :image, :width, :height, :x, :y, :tag
     attr_accessor :z
-    def initialize(label: nil, tooltip: nil, image: nil, x: 0, y: 0, z: 0, color: Gosu::Color::GREEN, &block)
+    def initialize(label: nil, tooltip: nil, image: nil, x: 0, y: 0, z: 0, color: Gosu::Color::GREEN, tag: nil, &block)
       @label, @image = label, image
       @x, @y, @z = x, y, z
       @color = color
+      @tag   = tag
       @block = block
 
       @width, @height = 0, 0
@@ -97,7 +98,7 @@ class AuthorEngine
         @image.draw
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @image.draw(@x+@x_padding, @y+@y_padding, @z)
+        @image.draw(@x+@x_padding, @y+@y_padding, @z, (1 * window.scale_x), (1 * window.scale_y))
 
       else
         raise "Nothing to draw! (text and image were nil or invalid types)"
@@ -119,7 +120,7 @@ class AuthorEngine
         @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
+        @width, @height = (@image.width * window.scale_x)+(@x_padding*2), (@image.height * window.scale_y)+(@y_padding)
 
       else
         raise "From Button -> text and image were nil or invalid types"

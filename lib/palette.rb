@@ -2,19 +2,23 @@ class AuthorEngine
   class Palette
     include Support
 
-    def initialize(x, y, size = 8)
+    def initialize(x:, y:, size: 8)
       @x_padding = window.scale_x
       @y_padding = window.scale_y
 
       @size = (size * @y_padding)
       @slot_width = 8
+
       set_origin(x, y)
+
       @color_set = [
         [
           Gosu::Color.rgb(0,0,0),
           Gosu::Color.rgb(29, 43, 83),
           Gosu::Color.rgb(126, 37, 83),
-          Gosu::Color.rgb(0, 135, 81),
+          Gosu::Color.rgb(0, 135, 81)
+        ],
+        [
           Gosu::Color.rgb(171, 82, 54),
           Gosu::Color.rgb(95, 87, 79),
           Gosu::Color.rgb(194, 195, 199),
@@ -24,7 +28,9 @@ class AuthorEngine
           Gosu::Color.rgb(255, 0, 77),
           Gosu::Color.rgb(255, 163, 0),
           Gosu::Color.rgb(225, 236, 39),
-          Gosu::Color.rgb(0, 228, 54),
+          Gosu::Color.rgb(0, 228, 54)
+        ],
+        [
           Gosu::Color.rgb(41, 173, 255),
           Gosu::Color.rgb(131, 118, 156),
           Gosu::Color.rgb(225, 119, 168),
