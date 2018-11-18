@@ -9,6 +9,10 @@ require_relative "lib/sprite"
 require_relative "lib/sprite_picker"
 require_relative "lib/palette"
 
+require_relative "lib/game/parts/graphics"
+require_relative "lib/game/parts/colors"
+require_relative "lib/game/game"
+
 require_relative "lib/views/play_viewer"
 require_relative "lib/views/sprite_editor"
 require_relative "lib/views/level_editor"

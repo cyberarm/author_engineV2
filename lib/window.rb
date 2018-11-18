@@ -8,13 +8,13 @@ class AuthorEngine
       @instance = _instance
     end
 
-    VIEW_WIDTH, VIEW_HEIGHT = 128.0, 128.0
+    VIEW_WIDTH, VIEW_HEIGHT, SIZE = 128.0, 128.0, 128.0
 
     attr_accessor :show_cursor
-    attr_reader :scale_x, :scale_y, :square_scale, :container
+    attr_reader :scale_x, :scale_y, :square_scale, :base_size, :container
     def initialize
       super(128,128, fullscreen: true)
-      # super(256, 256, fullscreen: true)
+      super(512, 512, fullscreen: false) if ARGV.join.include?("--console")
       # super(1280, 800, fullscreen: false)
       super(Gosu.screen_width, Gosu.screen_height, fullscreen: true) if ARGV.join.include?("--native")
 
@@ -24,6 +24,7 @@ class AuthorEngine
       @scale_x = 1.0
       @scale_y = 1.0
       @square_scale = 1.0
+      @base_size = SIZE
 
       @close_counter = 0
 

@@ -98,7 +98,7 @@ class AuthorEngine
         @image.draw
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @image.draw(@x+@x_padding, @y+@y_padding, @z, (1 * window.scale_x), (1 * window.scale_y))
+        @image.draw(@x+@x_padding, @y+@y_padding, @z, (1 * window.square_scale), (1 * window.square_scale))
 
       else
         raise "Nothing to draw! (text and image were nil or invalid types)"
@@ -120,7 +120,7 @@ class AuthorEngine
         @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
 
       elsif @image && @image.is_a?(Gosu::Image)
-        @width, @height = (@image.width * window.scale_x)+(@x_padding*2), (@image.height * window.scale_y)+(@y_padding)
+        @width, @height = (@image.width * window.square_scale)+(@x_padding*2), (@image.height * window.square_scale)+(@y_padding)
 
       else
         raise "From Button -> text and image were nil or invalid types"

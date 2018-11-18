@@ -14,6 +14,7 @@ def init
 end
 
 def draw
+  rect(10, 10, 10, 10)
 end
 
 def update
@@ -50,6 +51,8 @@ end
       @text.message = @text_input.text if @text_input
       highlight_text
     end
+
+    def code; @text_input.text; end
 
     def draw_caret
       active_line = 0
