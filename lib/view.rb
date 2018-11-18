@@ -26,6 +26,9 @@ class AuthorEngine
     def focus
     end
 
+    def blur
+    end
+
     def draw
       Gosu.draw_rect(@x, @y, @width, @height, @background)
     end
