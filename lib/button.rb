@@ -106,7 +106,7 @@ class AuthorEngine
     end
 
     def draw_tooltip
-      Gosu.draw_rect(@tooltip.x-@x_padding, @tooltip.y-@y_padding, @tooltip.width+(@x_padding*2), @tooltip.height+(@y_padding*2), Gosu::Color.rgba(0,0,0, 200), @tooltip.z)
+      Gosu.draw_rect(@tooltip.x-@x_padding, @tooltip.y-(@y_padding*2), @tooltip.width+(@x_padding*2), @tooltip.height+(@y_padding*2), Gosu::Color.rgba(0,0,0, 200), @tooltip.z)
       @tooltip.draw
     end
 
@@ -130,10 +130,10 @@ class AuthorEngine
         if (@x + @tooltip.width + @x_padding) > window.width
           @tooltip.x = @x - (((@x+@tooltip.width) - window.width) + @x_padding)
         else
-          @tooltip.x = @x
+          @tooltip.x = (@x - @tooltip.width / 2) + @width/2
         end
 
-        @tooltip.y = (@y + @height + @y_padding)
+        @tooltip.y = (@y + @height + (@y_padding*2))
       end
     end
 

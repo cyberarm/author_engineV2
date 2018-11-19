@@ -5,7 +5,7 @@ class AuthorEngine
 
       @error_icon = Gosu::Image.new("assets/ui/error_icon.png", retro: true)
       @error_icon_color = 0
-      @error_icon_colors = [Gosu::Color::WHITE, Gosu::Color::YELLOW]
+      @error_icon_colors = [yellow, orange]
 
       @loading_icon = Gosu::Image.new("assets/ui/loading_icon.png", retro: true)
       @loading_icon_angle = 0
@@ -54,7 +54,7 @@ class AuthorEngine
     def format_error(text:, error:)
       max_width = window.width - (@x_padding*2)
 
-      backtrace = "<c=521>#{error.class}</c>\nBacktrace:\n"
+      backtrace = "<c=#{xml_color(orange)}>#{error.class}</c>\nBacktrace:\n"
       error.backtrace.each {|trace| next unless trace.include?("(eval)"); backtrace+="  #{trace}\n"}
       message = "#{backtrace}\n#{error.message}"
       text.message = message

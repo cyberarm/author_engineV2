@@ -13,7 +13,7 @@ class AuthorEngine
         if @fonts.dig(size)
           font = @fonts.dig(size)
         else
-          font = (@fonts[size] = Gosu::Font.new(size, name: "Consolas"))
+          font = (@fonts[size] = Gosu::Font.new(size, name: Text::FONT_DEFAULT))
         end
 
         font.draw_markup(text, x, y, z)

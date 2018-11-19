@@ -1,6 +1,7 @@
 class AuthorEngine
   class View
     include Support
+    include AuthorEngine::Part::Colors
 
     def self.instance
       @instance
