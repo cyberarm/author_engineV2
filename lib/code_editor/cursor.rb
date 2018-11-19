@@ -73,15 +73,24 @@ class AuthorEngine
         end
 
         if @caret_x + window.square_scale > @view.width - @text.x
-          @x_offset = (@width - @text.x) - (@caret_x + window.square_scale)
+          @view.x_offset = (@view.width - @text.x) - (@caret_x + window.square_scale)
         else
-          @x_offset = 0
+          @view.x_offset = 0
         end
       end
 
       def make_visible
         @view.y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
         @view.y_offset = 0 if @view.y_offset > 0
+      end
+
+      def position
+        @text_input.caret_pos
+      end
+
+      def set_position(int)
+        @text_input.caret_pos = int
+        @text_input.selection_start = int # See: https://github.com/gosu/gosu/issues/228
       end
 
       def move(direction)
@@ -100,8 +109,7 @@ class AuthorEngine
           raise
         end
 
-        @text_input.caret_pos = pos
-        @text_input.selection_start = pos # See: https://github.com/gosu/gosu/issues/228
+        set_position(pos)
       end
     end
   end

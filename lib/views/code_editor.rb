@@ -34,7 +34,7 @@ end
     EOF
 
 
-    attr_accessor :y_offset
+    attr_accessor :x_offset, :y_offset
     def setup
       @font_size = 6 * window.square_scale.floor
       @font = Gosu::Font.new(@font_size, name: Text::FONT_DEFAULT_BOLD) # "Consolas"
@@ -105,15 +105,21 @@ end
     end
 
     def button_up(id)
+      cursor_pos = @text_input.caret_pos # get a copy of the current cursor location
+
       if id == Gosu::KbEnter || id == Gosu::KbReturn
         raise if @caret_pos != @text_input.caret_pos
         @text_input.text = @text_input.text.insert(@text_input.caret_pos, "\n")
-        # TODO: add callback to set caret position to this
-        @text_input.caret_pos = @text_input.caret_pos+1
+        @cursor.set_position(cursor_pos+1)
       end
 
       @cursor.move(:up) if id == Gosu::KbUp
       @cursor.move(:down) if id == Gosu::KbDown
+
+      if id == Gosu::KbTab
+        @text_input.text = @text_input.text.insert(cursor_pos, "  ")
+        @cursor.set_position(cursor_pos+2)
+      end
     end
   end
 end

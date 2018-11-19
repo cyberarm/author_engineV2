@@ -18,6 +18,18 @@ class AuthorEngine
 
         font.draw_markup(text, x, y, z)
       end
+
+      def translate(x, y, &block)
+        Gosu.translate(x, y) do
+          block.call if block
+        end
+      end
+
+      def rotate(angle, around_x = 0, around_y = 0, &block)
+        Gosu.rotate(angle, around_x, around_y) do
+          block.call if block
+        end
+      end
     end
   end
 end
