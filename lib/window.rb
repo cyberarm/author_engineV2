@@ -58,6 +58,18 @@ class AuthorEngine
       @show_cursor
     end
 
+    def control_button_down?
+      (Gosu.button_down?(Gosu::KbLeftControl) || Gosu.button_down?(Gosu::KbRightControl))
+    end
+
+    def alt_button_down?
+      (Gosu.button_down?(Gosu::KbLeftAlt) || Gosu.button_down?(Gosu::KbRightAlt))
+    end
+
+    def shift_button_down?
+      (Gosu.button_down?(Gosu::KbLeftShift) || Gosu.button_down?(Gosu::KbRightShift))
+    end
+
     def button_up(id)
       if id == Gosu::KbEscape
         @close_counter += 1

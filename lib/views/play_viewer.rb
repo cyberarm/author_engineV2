@@ -145,7 +145,7 @@ class AuthorEngine
       end
 
       stop if id == Gosu::KbEscape
-      play if id == Gosu::KbP && (Gosu.button_down?(Gosu::KbLeftControl) || Gosu.button_down?(Gosu::KbRightControl))
+      play if id == Gosu::KbP && window.control_button_down?
     end
   end
 end

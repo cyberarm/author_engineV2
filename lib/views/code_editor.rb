@@ -48,8 +48,6 @@ end
       @cursor = Cursor.new(view: self, text_input: @text_input, text: @text)
       @highlighting = Highlighting.new
 
-      @highlight_color = Gosu::Color.rgba(dark_gray.red, dark_gray.green, dark_gray.blue, 100)
-
       @x_offset, @y_offset = 0, 0
     end
 
@@ -63,11 +61,12 @@ end
     end
 
     def draw
+      # Gosu.draw_rect(0, window.container.header_height, @width, @height, white)
       super
       Gosu.clip_to(0, window.container.header_height, window.width, window.height - window.container.header_height) do
-        Gosu.translate(0, @y_offset) do
-          Gosu.draw_rect(0, window.container.header_height, @line_numbers_width, Float::INFINITY, dark_gray)
+        Gosu.draw_rect(0, window.container.header_height, @line_numbers_width, @height, dark_gray)
 
+        Gosu.translate(0, @y_offset) do
           min_width = @font.text_width("0")+@x_padding
           (@text.message.lines.map(&:chomp)).each_with_index do |line, index|
             min_width = @font.text_width("#{index+1}") if @font.text_width("#{index+1}") > min_width
@@ -78,13 +77,12 @@ end
           @line_numbers_width = min_width
           @text.x = @line_numbers_width+@x_padding
         end
+      end
 
+      Gosu.clip_to(@line_numbers_width, window.container.header_height, window.width, @height) do
         Gosu.translate(@x_offset, @y_offset) do
-          Gosu.clip_to(@line_numbers_width, window.container.header_height, window.width, Float::INFINITY) do
-            highlight_line
-            @text.draw_markup
-            @cursor.draw
-          end
+          @text.draw_markup
+          @cursor.draw
         end
       end
     end
@@ -100,10 +98,6 @@ end
 
     def code; @text_input.text; end
 
-    def highlight_line
-      Gosu.draw_rect(0, @text.y + (@cursor.active_line * @text.height), Float::INFINITY, @text.height, @highlight_color)
-    end
-
     def button_up(id)
       cursor_pos = @text_input.caret_pos # get a copy of the current cursor location
 
@@ -117,9 +111,40 @@ end
       @cursor.move(:down) if id == Gosu::KbDown
 
       if id == Gosu::KbTab
-        @text_input.text = @text_input.text.insert(cursor_pos, "  ")
-        @cursor.set_position(cursor_pos+2)
+        text = @text_input.text
+
+        if window.shift_button_down?
+          # FIXME: remove spaces behide cursor
+
+          # chars = @text_input.text.chars
+
+          # if text[cursor_pos] == " " && text[cursor_pos-1] == " "
+          #   chars.delete_at(cursor_pos-1)
+          #   chars.delete_at(cursor_pos)
+          #   @cursor.set_position(cursor_pos-2)
+
+          #   text = chars.join
+          # elsif text[cursor_pos] == " "
+          #   chars.delete_at(cursor_pos-1)
+          #   @cursor.set_position(cursor_pos-1)
+
+          #   text = chars.join
+          # else
+          #   p text[cursor_pos]
+          # end
+
+        else
+          @text_input.text = @text_input.text.insert(cursor_pos, "  ")
+          p cursor_pos+2
+          @cursor.set_position(cursor_pos+2)
+        end
       end
+
+      if id == Gosu::KbA && window.control_button_down?
+        @cursor.select_all
+      end
+
+      @cursor.button_up(id)
     end
   end
 end
