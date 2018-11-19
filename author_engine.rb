@@ -17,6 +17,8 @@ require_relative "lib/palette"
 
 require_relative "lib/game/game"
 
+require_relative "lib/code_editor/cursor"
+require_relative "lib/code_editor/highlighting"
 
 require_relative "lib/views/play_viewer"
 require_relative "lib/views/sprite_editor"

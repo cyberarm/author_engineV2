@@ -11,6 +11,7 @@ class AuthorEngine
       @instance = klass
     end
 
+    attr_reader :x, :y, :width, :height, :background
     def initialize(x:, y:, width:, height:, background: Gosu::Color::BLACK)
       @x, @y, @width, @height, @background = x, y, width, height, background
 

@@ -13,8 +13,8 @@ class AuthorEngine
     attr_accessor :show_cursor
     attr_reader :scale_x, :scale_y, :square_scale, :base_size, :container
     def initialize
-      super(128,128, fullscreen: true)
-      super(512, 512, fullscreen: false) if ARGV.join.include?("--console")
+      super(512, 512, fullscreen: false)
+      super(512, 512, fullscreen: true) if ARGV.join.include?("--fullscreen")
       # super(1280, 800, fullscreen: false)
       super(Gosu.screen_width, Gosu.screen_height, fullscreen: true) if ARGV.join.include?("--native")
 
