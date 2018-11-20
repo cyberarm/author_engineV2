@@ -29,6 +29,20 @@ class AuthorEngine
         width: window.width - (16 * window.scale_x),
         height: 32 * window.scale_y
       )
+
+      @pixel_lock = false
+      @lock_toggle_button = Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+        @lock_icon ||= b.image
+        @unlock_icon ||= Gosu::Image.new("assets/ui/unlock_icon.png", retro: true)
+
+        @pixel_lock = !@pixel_lock
+
+        if @pixel_lock
+          b.image = @unlock_icon
+        else
+          b.image = @lock_icon
+        end
+      end
     end
 
     def focus
@@ -41,10 +55,12 @@ class AuthorEngine
       @pixels.each(&:draw)
       highlight_pixel
 
-      Gosu.draw_rect(@grid_x-@x_padding, @grid_y-@y_padding, @grid_width+(@x_padding*2), @grid_height+(@y_padding*2), Gosu::Color::WHITE)
+      Gosu.draw_rect(@grid_x-window.square_scale, @grid_y-window.square_scale, @grid_width+(window.square_scale*2), @grid_height+(window.square_scale*2), Gosu::Color::WHITE)
       Gosu.draw_rect(@grid_x, @grid_y, @grid_width, @grid_height, Gosu::Color.rgba(10, 10, 10, 200))
       @palette.draw
       @sprites.draw
+
+      @lock_toggle_button.draw
     end
 
     def update
@@ -104,6 +120,7 @@ class AuthorEngine
         if window.mouse_x.between?(pixel.x, pixel.x+pixel.width)
           if window.mouse_y.between?(pixel.y, pixel.y+pixel.height)
             return if color.nil?
+            return if pixel.color != BLANK_COLOR && @pixel_lock
             pixel.color = color
             break
           end
@@ -118,6 +135,7 @@ class AuthorEngine
     def button_up(id)
       super
       @palette.button_up(id)
+      @lock_toggle_button.button_up(id)
       paint if id == Gosu::MsLeft
       erase if id == Gosu::MsRight
     end

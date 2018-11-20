@@ -3,6 +3,7 @@ class AuthorEngine
     include Support
     include AuthorEngine::Part::Colors
 
+    attr_accessor :x, :y, :width, :height
     def initialize(x:, y:, size: 8)
       @x_padding = window.scale_x
       @y_padding = window.scale_y
@@ -63,7 +64,7 @@ class AuthorEngine
     end
 
     def draw
-      Gosu.draw_rect(@x-@x_padding, @y-@y_padding, @width + (@x_padding*2), @height + (@y_padding*2), light_gray)
+      Gosu.draw_rect(@x-window.square_scale, @y-window.square_scale, @width + (window.square_scale*2), @height + (window.square_scale*2), light_gray)
       draw_colors
       hightlight_active_color
     end

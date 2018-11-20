@@ -25,14 +25,24 @@ class AuthorEngine
         @image = Gosu::Image.new(@image, retro: true)
       end
 
-      set_interactive_colors
-      position_elements
-
       if tooltip.is_a?(String)
         @tooltip = AuthorEngine::Text.new(message: tooltip, x: @x, y: @y+@height, z: 1000)
       end
 
+      set_interactive_colors
+      position_elements
+
       return self
+    end
+
+    def image=(gosu_image)
+      @image = gosu_image
+      position_elements
+    end
+
+    def label=(text)
+      @label.text = text
+      position_elements
     end
 
     def draw
@@ -69,12 +79,12 @@ class AuthorEngine
     end
 
     def set_interactive_colors
-      if @color.value > 0.3
-        @color_active = Gosu::Color.new(@color.alpha-50, @color.red, @color.green, @color.blue)
-        @color_hover  = Gosu::Color.new(@color.alpha-25, @color.red, @color.green, @color.blue)
+      if @color.value > 0.7
+        @color_active = window.darken(@color, 50)
+        @color_hover  = window.darken(@color)
       else
-        @color_active = Gosu::Color.new(@color.alpha-25, @color.red, @color.green, @color.blue)
-        @color_hover  = Gosu::Color.new(@color.alpha-10, @color.red, @color.green, @color.blue)
+        @color_active = window.lighten(@color, 50)
+        @color_hover  = window.lighten(@color)
       end
     end
 

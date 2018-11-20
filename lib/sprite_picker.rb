@@ -16,11 +16,13 @@ class AuthorEngine
     end
 
     def draw_grid
-      deviser = @width / (16 * window.scale_x)
-      (deviser - 1).floor.times do |i|
+      deviser = @width / (16 * window.square_scale).floor
+      (deviser).floor.times do |i|
         i += 1
+        # Vertical line
         Gosu.draw_rect((@x + (i * (@width / deviser))) - 1, @y, 1, @height, Gosu::Color::WHITE, 16)
       end
+      #Horizontal line
       Gosu.draw_rect(@x, @y + (@height / 2), @width, 1, Gosu::Color::WHITE, 16)
     end
 

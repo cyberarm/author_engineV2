@@ -47,7 +47,6 @@ class AuthorEngine
         # CAUTION: This randomly started working!
         #          And then stopped...?
         line = @newline_data[@active_line]
-        # p @active_line,position,line
 
         if id == Gosu::KbHome
           pos  = line[:position_end_of_line] - line[:text_length]
@@ -57,7 +56,6 @@ class AuthorEngine
 
         if id == Gosu::KbEnd
           pos  = line[:position_end_of_line]
-          p position, pos
 
           set_position(pos)
         end
