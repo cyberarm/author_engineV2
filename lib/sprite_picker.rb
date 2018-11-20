@@ -19,14 +19,17 @@ class AuthorEngine
 
       @columns = (@width  / @scaled_sprite_size).floor
       @rows    = (@height / @scaled_sprite_size).floor
+
+      @offset = 1 * window.square_scale
     end
 
     def draw
-      Gosu.clip_to(@x, @y, @width, @height) do
+      # Gosu.clip_to(@x, @y, @width, @height) do
+        Gosu.draw_rect(@x-@offset, @y-@offset, @width+(@offset*2), @height+(@offset*2), Gosu::Color::WHITE, 15)
         Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color.rgba(10, 10, 10, 200), 15)
         draw_grid
         draw_sprites
-      end
+      # end
     end
 
     def draw_grid

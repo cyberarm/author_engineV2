@@ -27,14 +27,30 @@ class AuthorEngine
       @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
       @sprites_picker = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
 
+      @tools = []
       @pixel_lock = false
-      @lock_toggle_button = Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+      @pixel_floodfill = false # aka bucket tool
+
+      @tools << Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
         @lock_icon ||= b.image
         @unlock_icon ||= AuthorEngine::Image.new("assets/ui/unlock_icon.png", retro: true)
 
         @pixel_lock = !@pixel_lock
 
         if @pixel_lock
+          b.image = @unlock_icon
+        else
+          b.image = @lock_icon
+        end
+      end
+
+      @tools << Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle bucket", x: @palette.x + @tools.first.width, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+        @lock_icon ||= b.image
+        @unlock_icon ||= AuthorEngine::Image.new("assets/ui/unlock_icon.png", retro: true)
+
+        @pixel_floodfill = !@pixel_floodfill
+
+        if @pixel_floodfill
           b.image = @unlock_icon
         else
           b.image = @lock_icon
@@ -57,18 +73,20 @@ class AuthorEngine
       @palette.draw
       @sprites_picker.draw
 
-      @lock_toggle_button.draw
+      @tools.each(&:draw)
     end
 
     def update
       super
-      paint if Gosu.button_down?(Gosu::MsLeft)
-      erase if Gosu.button_down?(Gosu::MsRight)
+      unless @pixel_floodfill
+        paint if Gosu.button_down?(Gosu::MsLeft)
+        erase if Gosu.button_down?(Gosu::MsRight)
+      end
       @palette.update
     end
 
     def create_grid(x, y, size)
-      size = size * window.scale_y
+      size = size * window.square_scale
 
       @grid_x = (window.width / 2) - (((size * x) / 2) + size*2 )
       @grid_y = window.container.header_height + size
@@ -112,6 +130,16 @@ class AuthorEngine
       end
     end
 
+    def get_pixel_at(x, y)
+      @pixels.detect do |pixel|
+        if x.between?(pixel.x, pixel.x+pixel.width)
+          if y.between?(pixel.y, pixel.y+pixel.height)
+            return pixel
+          end
+        end
+      end
+    end
+
     def paint(color = @palette.color)
       @pixels.each do |pixel|
         if window.mouse_x.between?(pixel.x, pixel.x+pixel.width)
@@ -128,6 +156,35 @@ class AuthorEngine
 
     def erase
       paint(BLANK_COLOR)
+    end
+
+    # AKA The Bucket Tool
+    # @param pixel [Pixel]
+    # @param target_color [Gosu::Color] color to search and replace with replacement_color
+    # @param replacement_color [Gosu::Color] color to replace Pixel's current color
+    def floodfill(pixel, target_color, replacement_color)
+      return unless pixel
+      return if pixel.color == replacement_color
+      return if pixel.color != target_color
+
+      pixel.color = replacement_color
+      @canvas_changed = true
+
+      # UP
+      _pixel = get_pixel_at(pixel.x, pixel.y)
+      floodfill(_pixel, target_color, replacement_color)
+
+      # DOWN
+      # _pixel = get_pixel_at(pixel.x, pixel.y + @grid_pixel_size)
+      # floodfill(_pixel, target_color, replacement_color)
+
+      # LEFT
+      # _pixel = get_pixel_at(pixel.x - @grid_pixel_size, pixel.y)
+      # floodfill(_pixel, target_color, replacement_color)
+
+      # RIGHT
+      # _pixel = get_pixel_at(pixel.x + @grid_pixel_size, pixel.y)
+      # floodfill(_pixel, target_color, replacement_color)
     end
 
     def sprites
@@ -166,9 +223,16 @@ class AuthorEngine
       @palette.button_up(id)
       @sprites_picker.button_up(id)
 
-      @lock_toggle_button.button_up(id)
-      paint if id == Gosu::MsLeft
-      erase if id == Gosu::MsRight
+      @tools.each{ |b| b.button_up(id) }
+
+      if @pixel_floodfill && @palette.color
+        pixel = get_pixel_at(window.mouse_x, window.mouse_y)
+        if pixel
+          floodfill(pixel, pixel.color, @palette.color) if id == Gosu::MsLeft
+          floodfill(pixel, pixel.color, BLANK_COLOR) if id == Gosu::MsRight
+        end
+      end
+
       update_sprite if id == (Gosu::MsLeft || Gosu::MsRight) && @canvas_changed
     end
   end
