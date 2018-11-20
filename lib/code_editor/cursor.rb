@@ -87,12 +87,13 @@ class AuthorEngine
           return
         end
 
-        sub_text = @text_input.text[0..position].lines[@active_line][0..position]
-        p position,sub_text
+        line = @text_input.text[0..position-1].lines[@active_line]
+        sub_text = ""
+        if line
+          sub_text = line[0..position-1]
+        end
 
-        @x = @text.font.markup_width(sub_text)-1
-        p @x
-
+        @x = @text.font.markup_width(sub_text)
         @y = @text.height * @active_line
       end
 

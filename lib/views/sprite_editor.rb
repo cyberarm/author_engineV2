@@ -1,6 +1,6 @@
 class AuthorEngine
   class SpriteEditor < View
-    MAGIC_BLANK_COLOR = Gosu::Color.rgba(1,1,1, 222)
+    BLANK_COLOR = Gosu::Color.rgba(0,0,0, 0)
     class Pixel
       attr_accessor :x, :y, :width, :height, :color
       def initialize(x, y, width, height, color)
@@ -41,6 +41,8 @@ class AuthorEngine
       @pixels.each(&:draw)
       highlight_pixel
 
+      Gosu.draw_rect(@grid_x-@x_padding, @grid_y-@y_padding, @grid_width+(@x_padding*2), @grid_height+(@y_padding*2), Gosu::Color::WHITE)
+      Gosu.draw_rect(@grid_x, @grid_y, @grid_width, @grid_height, Gosu::Color.rgba(10, 10, 10, 200))
       @palette.draw
       @sprites.draw
     end
@@ -66,23 +68,32 @@ class AuthorEngine
           @pixels << Pixel.new(
             @grid_x+(_x*size), @grid_y+(_y*size),
             size, size,
-            MAGIC_BLANK_COLOR
+            BLANK_COLOR
           )
         end
       end
     end
 
     def highlight_pixel
-      @pixels.each do |pixel|
+      return unless @palette.color
+
+      @pixels.detect do |pixel|
         if window.mouse_x.between?(pixel.x, pixel.x+pixel.width)
           if window.mouse_y.between?(pixel.y, pixel.y+pixel.height)
+            Gosu.draw_rect(
+              pixel.x, pixel.y,
+              pixel.width, pixel.height,
+              @palette.color,
+              6
+            )
+
             Gosu.draw_rect(
               pixel.x, pixel.y,
               pixel.width, pixel.height,
               Gosu::Color.rgba(255,255,255, 100),
               6
             )
-            break
+            return true
           end
         end
       end
@@ -101,7 +112,7 @@ class AuthorEngine
     end
 
     def erase
-      paint(MAGIC_BLANK_COLOR)
+      paint(BLANK_COLOR)
     end
 
     def button_up(id)
@@ -109,8 +120,6 @@ class AuthorEngine
       @palette.button_up(id)
       paint if id == Gosu::MsLeft
       erase if id == Gosu::MsRight
-
-      window.close if id == Gosu::KbEscape
     end
   end
 end
