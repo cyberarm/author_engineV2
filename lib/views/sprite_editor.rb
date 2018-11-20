@@ -19,11 +19,13 @@ class AuthorEngine
 
     def setup
       @pixels = []
+      @sprites= []
       @active_color = Gosu::Color.rgba(101,1,101, 255)
 
       create_grid(16, 16, 4)
+      @canvas_changed = false
       @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
-      @sprites = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
+      @sprites_picker = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
 
       @pixel_lock = false
       @lock_toggle_button = Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
@@ -53,7 +55,7 @@ class AuthorEngine
       Gosu.draw_rect(@grid_x-window.square_scale, @grid_y-window.square_scale, @grid_width+(window.square_scale*2), @grid_height+(window.square_scale*2), Gosu::Color::WHITE)
       Gosu.draw_rect(@grid_x, @grid_y, @grid_width, @grid_height, Gosu::Color.rgba(10, 10, 10, 200))
       @palette.draw
-      @sprites.draw
+      @sprites_picker.draw
 
       @lock_toggle_button.draw
     end
@@ -116,6 +118,7 @@ class AuthorEngine
           if window.mouse_y.between?(pixel.y, pixel.y+pixel.height)
             return if color.nil?
             return if pixel.color != BLANK_COLOR && @pixel_lock
+            @canvas_changed = true
             pixel.color = color
             break
           end
@@ -127,12 +130,46 @@ class AuthorEngine
       paint(BLANK_COLOR)
     end
 
+    def sprites
+      @sprites
+    end
+
+    def update_sprite
+      list = []
+
+      @pixels.each_slice(window.sprite_size).each do |row|
+        list << row
+      end
+
+      image = Gosu.render(window.sprite_size, window.sprite_size, retro: true) do
+        list.each_with_index do |row, y|
+          row.each_with_index do |pixel, x|
+            Gosu.draw_rect(x, y, 1, 1, pixel.color)
+          end
+        end
+      end
+
+      if @sprites[@sprites_picker.active_sprite]
+        @sprites[@sprites_picker.active_sprite] = nil # release image for garbage collection?
+        @sprites[@sprites_picker.active_sprite] = image
+      else
+        @sprites.insert(@sprites_picker.active_sprite, image)
+      end
+      @canvas_changed = false
+    end
+
+    def build_sprite_sheet
+    end
+
     def button_up(id)
       super
       @palette.button_up(id)
+      @sprites_picker.button_up(id)
+
       @lock_toggle_button.button_up(id)
       paint if id == Gosu::MsLeft
       erase if id == Gosu::MsRight
+      update_sprite if id == (Gosu::MsLeft || Gosu::MsRight) && @canvas_changed
     end
   end
 end
