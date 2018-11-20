@@ -88,10 +88,18 @@ class AuthorEngine
       (Gosu.button_down?(Gosu::KbLeftShift) || Gosu.button_down?(Gosu::KbRightShift))
     end
 
+    def save_and_exit
+      # SpriteEditor.instance.build_sprite_sheet.save("PATH/spritesheet.png")
+      # LevelEditor.instance.save("PATH/levels.file_extension")
+      # CodeEditor.instance.save("PATH/main.rb")
+
+      close
+    end
+
     def button_up(id)
       if id == Gosu::KbEscape
         @close_counter += 1
-        close if @close_counter == 2
+        save_and_exit if @close_counter == 2
       else
         @close_counter = 0
       end
