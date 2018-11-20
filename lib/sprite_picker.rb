@@ -4,7 +4,7 @@ class AuthorEngine
 
     def initialize(x: nil, y:, width: nil, height: nil)
       @x, @y, @width, @height = x, y, width, height
-      @sprite_size = 16
+      @sprite_size = window.sprite_size
       @scaled_sprite_size = @sprite_size * window.square_scale
 
       @width = width ? width : window.width - (@scaled_sprite_size)

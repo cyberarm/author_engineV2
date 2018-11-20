@@ -14,6 +14,7 @@ require_relative "lib/text"
 require_relative "lib/sprite"
 require_relative "lib/sprite_picker"
 require_relative "lib/palette"
+require_relative "lib/image"
 
 require_relative "lib/game/game"
 

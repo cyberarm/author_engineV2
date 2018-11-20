@@ -28,7 +28,7 @@ class AuthorEngine
       @pixel_lock = false
       @lock_toggle_button = Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
         @lock_icon ||= b.image
-        @unlock_icon ||= Gosu::Image.new("assets/ui/unlock_icon.png", retro: true)
+        @unlock_icon ||= AuthorEngine::Image.new("assets/ui/unlock_icon.png", retro: true)
 
         @pixel_lock = !@pixel_lock
 

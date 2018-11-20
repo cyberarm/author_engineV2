@@ -11,7 +11,7 @@ class AuthorEngine
     VIEW_WIDTH, VIEW_HEIGHT, SIZE = 128.0, 128.0, 128.0
 
     attr_accessor :show_cursor
-    attr_reader :scale_x, :scale_y, :square_scale, :base_size, :container
+    attr_reader :scale_x, :scale_y, :square_scale, :base_size, :container, :sprite_size
     def initialize
       super(512, 512, fullscreen: false)
       super(512, 512, fullscreen: true) if ARGV.join.include?("--fullscreen")
@@ -25,6 +25,8 @@ class AuthorEngine
       @scale_y = 1.0
       @square_scale = 1.0
       @base_size = SIZE
+
+      @sprite_size = 16
 
       @close_counter = 0
 

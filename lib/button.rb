@@ -22,7 +22,7 @@ class AuthorEngine
       end
 
       if @image.is_a?(String)
-        @image = Gosu::Image.new(@image, retro: true)
+        @image = AuthorEngine::Image.new(@image, retro: true)
       end
 
       if tooltip.is_a?(String)
@@ -107,7 +107,7 @@ class AuthorEngine
       elsif @image && @image.is_a?(AuthorEngine::Sprite)
         @image.draw
 
-      elsif @image && @image.is_a?(Gosu::Image)
+      elsif @image && @image.is_a?(AuthorEngine::Image)
         @image.draw(@x+@x_padding, @y+@y_padding, @z, (1 * window.square_scale), (1 * window.square_scale))
 
       else
@@ -129,7 +129,7 @@ class AuthorEngine
         @image.x, @image.y = @x+@x_padding, @y+@y_padding
         @width, @height = @image.width+(@x_padding*2), @image.height+(@y_padding*2)
 
-      elsif @image && @image.is_a?(Gosu::Image)
+      elsif @image && @image.is_a?(AuthorEngine::Image)
         @width, @height = (@image.width * window.square_scale)+(@x_padding*2), (@image.height * window.square_scale)+(@y_padding)
 
       else

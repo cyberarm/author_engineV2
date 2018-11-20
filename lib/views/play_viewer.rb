@@ -3,11 +3,11 @@ class AuthorEngine
     def setup
       @running = false
 
-      @error_icon = Gosu::Image.new("assets/ui/error_icon.png", retro: true)
+      @error_icon = AuthorEngine::Image.new("assets/ui/error_icon.png", retro: true)
       @error_icon_color = 0
       @error_icon_colors = [yellow, orange]
 
-      @loading_icon = Gosu::Image.new("assets/ui/loading_icon.png", retro: true)
+      @loading_icon = AuthorEngine::Image.new("assets/ui/loading_icon.png", retro: true)
       @loading_icon_angle = 0
       @loading_icon_rot_step = 45
 
