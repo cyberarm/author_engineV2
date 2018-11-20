@@ -7,7 +7,7 @@ class AuthorEngine
         "up" => Gosu::KbUp,
         "down" => Gosu::KbDown,
         "x" => Gosu::KbX,
-        "y" => Gosu::KbZ,
+        "y" => Gosu::KbC,
       }
       def button?(name)
         down = false

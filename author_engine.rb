@@ -1,6 +1,7 @@
 require "gosu"
 require "coderay"
 
+require_relative "lib/game/parts/common"
 require_relative "lib/game/parts/graphics"
 require_relative "lib/game/parts/colors"
 require_relative "lib/game/parts/input"

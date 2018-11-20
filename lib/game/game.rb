@@ -1,5 +1,6 @@
 class AuthorEngine
   class Game
+    include AuthorEngine::Part::Common
     include AuthorEngine::Part::Colors
     include AuthorEngine::Part::Graphics
     include AuthorEngine::Part::Input

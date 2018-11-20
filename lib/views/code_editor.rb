@@ -10,8 +10,8 @@ class AuthorEngine
     DEFAULT_STRING = <<-EOF
 def init
   @size = 10
-  @x    = 59
-  @y    = 59
+  @x    = width/2  - @size/2
+  @y    = height/2 - @size/2
 end
 
 def draw

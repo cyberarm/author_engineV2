@@ -1,7 +1,7 @@
 class AuthorEngine
   class Part
     module Graphics
-      def rect(x, y, width, height, color = Gosu::Color::WHITE, z = 0)
+      def rect(x = 0, y = 0, width = 1, height = 1, color = Gosu::Color::WHITE, z = 0)
         Gosu.draw_rect(x, y, width, height, color, z)
       end
 
