@@ -46,19 +46,58 @@ class AuthorEngine
         # FIXME: Can't seem to get cursor position before it's set to 0...
         # CAUTION: This randomly started working!
         #          And then stopped...?
-        line = @newline_data[@active_line]
 
-        if id == Gosu::KbHome
+        case id
+        when Gosu::MsLeft
+          return unless @view.mouse_inside_view?
+
+          index = row_at(window.mouse_y)
+          line  = @newline_data.dig(index)
+          return unless line # no line at index
+          right_offset = column_at(window.mouse_x - @text.x, window.mouse_y)
+          pos = (line[:position_end_of_line] - line[:text_length]) + right_offset
+
+          set_position(pos)
+
+        when Gosu::KbHome
+          line = @newline_data[@active_line]
           pos  = line[:position_end_of_line] - line[:text_length]
 
           set_position(pos)
-        end
 
-        if id == Gosu::KbEnd
+        when Gosu::KbEnd
+          line = @newline_data[@active_line]
           pos  = line[:position_end_of_line]
 
           set_position(pos)
         end
+      end
+
+      # returns the line of lines from the top that y is at
+      def row_at(y)
+        return (((y.to_f - window.container.header_height.to_f) - @view.y_offset.to_f) / @text.height).floor
+      end
+
+      # returns the column for x on line y
+      def column_at(x, y)
+        x = @text.x if x < @text.x
+        line  = @newline_data.dig(row_at(y))
+        column= 0
+        return unless line
+        text  = line[:text]
+
+        buffer= ""
+        local_x=0
+
+        text.size.times do |i|
+          local_x = @text.font.text_width(buffer)
+
+          break if local_x >= x
+          column+=1
+          buffer+=text.chars[i]
+        end
+
+        return column
       end
 
       def build_newline_data

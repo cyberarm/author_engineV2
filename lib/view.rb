@@ -35,6 +35,14 @@ class AuthorEngine
       Gosu.draw_rect(@x, @y, @width, @height, @background)
     end
 
+    def mouse_inside_view?
+      if window.mouse_x.between?(@x, @x+@width)
+        if window.mouse_y.between?(@y, @y+@height)
+          return true
+        end
+      end
+    end
+
     def update
     end
 
