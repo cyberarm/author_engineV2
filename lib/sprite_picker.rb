@@ -2,28 +2,41 @@ class AuthorEngine
   class SpritePicker
     include Support
 
-    def initialize(x:, y:, width:, height:)
+    def initialize(x: nil, y:, width: nil, height: nil)
       @x, @y, @width, @height = x, y, width, height
+      @sprite_size = 16
+      @scaled_sprite_size = @sprite_size * window.square_scale
 
-      p (@width / 16.0)
-      p (@height / 16.0)
+      @width = width ? width : window.width - (@scaled_sprite_size)
+      @height= height ? height : @scaled_sprite_size*2
+
+      @x = x ? x : window.width/2 - @width/2
+
+      p (@width  / @scaled_sprite_size).floor
+      p (@height / @scaled_sprite_size).floor
+
+      @columns = (@width  / @scaled_sprite_size).floor
+      @rows    = (@height / @scaled_sprite_size).floor
     end
 
     def draw
-      Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color::BLACK, 15)
-      draw_grid
-      draw_sprites
+      Gosu.clip_to(@x, @y, @width, @height) do
+        Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color::BLACK, 15)
+        draw_grid
+        draw_sprites
+      end
     end
 
     def draw_grid
-      deviser = @width / (16 * window.square_scale).floor
-      (deviser).floor.times do |i|
+      (@columns-1).times do |i|
         i += 1
         # Vertical line
-        Gosu.draw_rect((@x + (i * (@width / deviser))) - 1, @y, 1, @height, Gosu::Color::WHITE, 16)
+        Gosu.draw_rect((@x + (i * @width /  @columns)) - 1, @y, 1, @height, Gosu::Color::WHITE, 16)
       end
       #Horizontal line
-      Gosu.draw_rect(@x, @y + (@height / 2), @width, 1, Gosu::Color::WHITE, 16)
+      (@rows-1).times do |i|
+        Gosu.draw_rect(@x, (@y + (i * @height / @rows)) + @scaled_sprite_size, @width, 1, Gosu::Color::WHITE, 16)
+      end
     end
 
     def draw_sprites

@@ -23,12 +23,7 @@ class AuthorEngine
 
       create_grid(16, 16, 4)
       @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
-      @sprites = SpritePicker.new(
-        x: 8 * window.scale_x,
-        y: @grid_y + @grid_height + (@grid_pixel_size * 2),
-        width: window.width - (16 * window.scale_x),
-        height: 32 * window.scale_y
-      )
+      @sprites = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
 
       @pixel_lock = false
       @lock_toggle_button = Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
