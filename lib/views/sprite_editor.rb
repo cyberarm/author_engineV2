@@ -108,54 +108,53 @@ class AuthorEngine
     def highlight_pixel
       return unless @palette.color
 
-      @pixels.detect do |pixel|
-        if window.mouse_x.between?(pixel.x, pixel.x+pixel.width)
-          if window.mouse_y.between?(pixel.y, pixel.y+pixel.height)
-            Gosu.draw_rect(
-              pixel.x, pixel.y,
-              pixel.width, pixel.height,
-              @palette.color,
-              6
-            )
+      pixel = get_pixel_at(window.mouse_x, window.mouse_y)
+      return unless pixel
+      Gosu.draw_rect(
+        pixel.x, pixel.y,
+        pixel.width, pixel.height,
+        @palette.color,
+        6
+      )
 
-            Gosu.draw_rect(
-              pixel.x, pixel.y,
-              pixel.width, pixel.height,
-              Gosu::Color.rgba(255,255,255, 100),
-              6
-            )
-            return true
-          end
-        end
-      end
-    end
-
-    def get_pixel_at(x, y)
-      @pixels.detect do |pixel|
-        if x.between?(pixel.x, pixel.x+pixel.width)
-          if y.between?(pixel.y, pixel.y+pixel.height)
-            return pixel
-          end
-        end
-      end
+      Gosu.draw_rect(
+        pixel.x, pixel.y,
+        pixel.width, pixel.height,
+        Gosu::Color.rgba(255,255,255, 100),
+        6
+      )
     end
 
     def paint(color = @palette.color)
-      @pixels.each do |pixel|
-        if window.mouse_x.between?(pixel.x, pixel.x+pixel.width)
-          if window.mouse_y.between?(pixel.y, pixel.y+pixel.height)
-            return if color.nil?
-            return if pixel.color != BLANK_COLOR && @pixel_lock
-            @canvas_changed = true
-            pixel.color = color
-            break
-          end
-        end
-      end
+      pixel = get_pixel_at(window.mouse_x, window.mouse_y)
+
+      return unless pixel
+      return if color.nil?
+      return if pixel.color != BLANK_COLOR && @pixel_lock
+
+      pixel.color = color
+      @canvas_changed = true
     end
 
     def erase
       paint(BLANK_COLOR)
+    end
+
+    def get_pixel_at(x, y)
+      return if (x >= @grid_x+@grid_width || y >= @grid_y+@grid_height)
+      x = normalize_x(x)
+      y = normalize_y(y)
+      return if (x < 0 || y < 0)
+
+      @pixels[(x + @grid_pixel_size * y)]
+    end
+
+    def normalize_x(int)
+      return ((int - @grid_x) / @grid_pixel_size).floor
+    end
+
+    def normalize_y(int)
+      return ((int - @grid_y) / @grid_pixel_size).floor
     end
 
     # AKA The Bucket Tool
@@ -171,20 +170,20 @@ class AuthorEngine
       @canvas_changed = true
 
       # UP
-      _pixel = get_pixel_at(pixel.x, pixel.y)
+      _pixel = get_pixel_at(pixel.x, pixel.y - @grid_pixel_size)
       floodfill(_pixel, target_color, replacement_color)
 
       # DOWN
-      # _pixel = get_pixel_at(pixel.x, pixel.y + @grid_pixel_size)
-      # floodfill(_pixel, target_color, replacement_color)
+      _pixel = get_pixel_at(pixel.x, pixel.y + @grid_pixel_size)
+      floodfill(_pixel, target_color, replacement_color)
 
       # LEFT
-      # _pixel = get_pixel_at(pixel.x - @grid_pixel_size, pixel.y)
-      # floodfill(_pixel, target_color, replacement_color)
+      _pixel = get_pixel_at(pixel.x - @grid_pixel_size, pixel.y)
+      floodfill(_pixel, target_color, replacement_color)
 
       # RIGHT
-      # _pixel = get_pixel_at(pixel.x + @grid_pixel_size, pixel.y)
-      # floodfill(_pixel, target_color, replacement_color)
+      _pixel = get_pixel_at(pixel.x + @grid_pixel_size, pixel.y)
+      floodfill(_pixel, target_color, replacement_color)
     end
 
     def sprites
@@ -233,7 +232,7 @@ class AuthorEngine
         end
       end
 
-      update_sprite if id == (Gosu::MsLeft || Gosu::MsRight) && @canvas_changed
+      update_sprite if (id == Gosu::MsLeft || id == Gosu::MsRight) && @canvas_changed
     end
   end
 end
