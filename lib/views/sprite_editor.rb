@@ -31,29 +31,29 @@ class AuthorEngine
       @pixel_lock = false
       @pixel_floodfill = false # aka bucket tool
 
-      @tools << Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
-        @lock_icon ||= b.image
-        @unlock_icon ||= AuthorEngine::Image.new("assets/ui/unlock_icon.png", retro: true)
+      @tools << Button.new(image: "assets/ui/unlock_icon.png", tooltip: "Toggle pixel lock", x: @palette.x, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+        @unlock_icon ||= b.image
+        @lock_icon ||= AuthorEngine::Image.new("assets/ui/lock_icon.png", retro: true)
 
         @pixel_lock = !@pixel_lock
 
         if @pixel_lock
-          b.image = @unlock_icon
-        else
           b.image = @lock_icon
+        else
+          b.image = @unlock_icon
         end
       end
 
-      @tools << Button.new(image: "assets/ui/lock_icon.png", tooltip: "Toggle bucket", x: @palette.x + @tools.first.width, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
-        @lock_icon ||= b.image
-        @unlock_icon ||= AuthorEngine::Image.new("assets/ui/unlock_icon.png", retro: true)
+      @tools << Button.new(image: "assets/ui/pencil_icon.png", tooltip: "Toggle pencil/bucket", x: @palette.x + @tools.first.width, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+        @pencil_icon ||= b.image
+        @bucket_icon ||= AuthorEngine::Image.new("assets/ui/bucket_icon.png", retro: true)
 
         @pixel_floodfill = !@pixel_floodfill
 
         if @pixel_floodfill
-          b.image = @unlock_icon
+          b.image = @bucket_icon
         else
-          b.image = @lock_icon
+          b.image = @pencil_icon
         end
       end
     end
