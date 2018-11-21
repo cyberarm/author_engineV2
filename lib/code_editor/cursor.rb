@@ -13,12 +13,14 @@ class AuthorEngine
         @x, @y = 0, 0
 
         @last_blink = Gosu.milliseconds
-        @last_position = 0
         @blink_interval = 250
         @show = false
 
         @newline_data = {}
         @active_line  = 0
+        @active_line_history_size  = 2
+        @active_line_history_index = 0
+        @active_line_history = []
 
         @highlight_color = Gosu::Color.rgba(dark_gray.red, dark_gray.green, dark_gray.blue, 100)
         @selection_color = Gosu::Color.rgba(blue.red, blue.green, blue.blue, 100)
@@ -27,7 +29,7 @@ class AuthorEngine
       def draw
         highlight_activeline
         # highlight_selection
-        Gosu.draw_rect(@text.x + @x, @text.y + @y, 1, @text.height, light_gray) if @show
+        Gosu.draw_rect(@text.x + @x, @y, 1, @text.height, light_gray) if @show
       end
 
       def update
@@ -39,7 +41,7 @@ class AuthorEngine
         update_caret
         make_visible
 
-        @last_position = position
+        update_active_line_history
       end
 
       def button_up(id)
@@ -60,13 +62,13 @@ class AuthorEngine
           set_position(pos)
 
         when Gosu::KbHome
-          line = @newline_data[@active_line]
+          line = @newline_data[last_active_line(0)]
           pos  = line[:position_end_of_line] - line[:text_length]
 
           set_position(pos)
 
         when Gosu::KbEnd
-          line = @newline_data[@active_line]
+          line = @newline_data[last_active_line(@newline_data.size-1)]
           pos  = line[:position_end_of_line]
 
           set_position(pos)
@@ -79,13 +81,14 @@ class AuthorEngine
       end
 
       # returns the column for x on line y
-      def column_at(x, y)
-        x = @text.x if x < @text.x
-        line  = @newline_data.dig(row_at(y))
+      def column_at(x, y, y_is_line = false)
+        x = @text.x if x < x-@text.x
+        line  = @newline_data.dig(row_at(y)) unless y_is_line
+        line  = @newline_data.dig(y) if y_is_line
         column= 0
         return unless line
-        text  = line[:text]
 
+        text  = line[:text]
         buffer= ""
         local_x=0
 
@@ -131,7 +134,7 @@ class AuthorEngine
         end
 
         @x = @text.font.markup_width(sub_text)
-        @y = @text.height * @active_line
+        @y = @text.y + (@active_line * @text.height)
       end
 
       def calculate_x_offset
@@ -153,6 +156,32 @@ class AuthorEngine
       def make_visible
         @view.y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
         @view.y_offset = 0 if @view.y_offset > 0
+      end
+
+      def update_active_line_history
+        @active_line_history_index = 0 unless @active_line_history_index < @active_line_history_size
+
+        unless @active_line_history[@active_line_history_index-1] == @active_line
+          @active_line_history[@active_line_history_index] = @active_line
+          @active_line_history_index+=1
+        end
+
+      end
+
+      # poison: line index at which home is 0 and end is @newline_data.size-1
+      def last_active_line(poison)
+        candidate = @active_line
+
+        # p poison
+
+        list = @active_line_history.reject{|l| l == poison}
+        return candidate unless list
+
+        # p @active_line_history,list
+
+        candidate = list.reverse.first if list.size > 0
+
+        return candidate
       end
 
       def highlight_activeline
@@ -183,23 +212,38 @@ class AuthorEngine
 
       def move(direction)
         pos = @text_input.caret_pos
-        active_line = @newline_data[@active_line]
         line = nil
 
         if direction == :up
           return if @active_line == 0
-          line = @newline_data[@active_line-1]
+          line  = @newline_data.dig(@active_line-1)
+          return unless line # no line at index
+          # current_offset = column_at(@x, (@active_line), true) # current line offset
+          above_offset = column_at(@x, (@active_line-1), true) # line up offset
+
+          # right_offset = current_offset
+          # right_offset = above_offset if current_offset >= above_offset
+          right_offset = above_offset
+
+          pos = (line[:position_end_of_line] - line[:text_length]) + right_offset
 
         elsif direction == :down
           return if @text_input.caret_pos == @text_input.text.size
           return unless @newline_data[@active_line+1]
-          line = @newline_data[@active_line+1]
+          line  = @newline_data.dig(@active_line+1)
+          return unless line # no line at index
+          # current_offset = column_at(@x, (@active_line), true) # current line offset
+          below_offset = column_at(@x, (@active_line+1), true) # line down offset
+
+          # right_offset = current_offset
+          # right_offset = below_offset if current_offset >= below_offset
+          right_offset = below_offset
+
+          pos = (line[:position_end_of_line] - line[:text_length]) + right_offset
 
         else
           raise ":up or :down please."
         end
-
-        pos = line[:position_end_of_line]
 
         set_position(pos)
       end
