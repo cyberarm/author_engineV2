@@ -3,6 +3,8 @@ class AuthorEngine
     include Support
 
     attr_reader :active_sprite
+    attr_reader :x, :y, :width, :height
+    attr_reader :rows, :columns
     def initialize(x: nil, y:, width: nil, height: nil)
       @x, @y, @width, @height = x, y, width, height
       @sprite_size = window.sprite_size
@@ -56,15 +58,65 @@ class AuthorEngine
           y+=@scaled_sprite_size
           x = @x
           n = 0
+        else
+          n += 1
         end
-        n += 1
+      end
+
+      highlight_sprite
+    end
+
+    def highlight_sprite
+      sprite_block do |x, y|
+        Gosu.draw_rect(x + @x, y + @y, @sprite_size * window.square_scale, @sprite_size * window.square_scale, Gosu::Color.rgba(0,0,0, 50), 17)
       end
     end
 
     def update
     end
 
+    def mouse_over_sprite?(x, y, width, height)
+      if window.mouse_x.between?(x, x + width) &&
+         window.mouse_y.between?(y, y + height)
+         return true
+      end
+    end
+
+    def select_sprite
+      sprite_block do |x, y, index|
+        @active_sprite = index
+        SpriteEditor.instance.set_sprite
+      end
+    end
+
+    def sprite_block(&block)
+      found = false
+      index = 0
+      @rows.times do |y|
+        _y = y * @scaled_sprite_size
+        break if found
+
+        @columns.times do |x|
+          break if found
+          _x = x * @scaled_sprite_size
+
+          if mouse_over_sprite?(_x + @x, _y + @y, @sprite_size * window.square_scale, @sprite_size * window.square_scale)
+            found = true
+            block.call(_x, _y, index, found) if block
+          end
+
+          index+=1
+        end
+      end
+    end
+
     def button_up(id)
+      case id
+      when Gosu::MsLeft
+        if mouse_over?(self)
+          select_sprite
+        end
+      end
     end
   end
 end

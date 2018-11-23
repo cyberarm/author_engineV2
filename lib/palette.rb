@@ -104,7 +104,7 @@ class AuthorEngine
       @color_set.each_with_index do |row, i|
         row.each_with_index do |color, x|
           if color == @active_color
-            Gosu.draw_rect(@x+(x*@size)-@x_padding, (@y+(@size*i))-@y_padding, @size+(@x_padding*2), @size+(@y_padding*2), Gosu::Color.rgba(255,255,255, 200), 8)
+            Gosu.draw_rect(@x+(x*@size)-window.square_scale, (@y+(@size*i))-window.square_scale, @size+(window.square_scale*2), @size+(window.square_scale*2), Gosu::Color.rgba(255,255,255, 200), 8)
             break
           end
         end

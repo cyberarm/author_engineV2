@@ -7,7 +7,7 @@ def init
   @y = 0
   @z = 0
 
-  @birdie
+  @birdie = 0
 end
 
 # All drawing operations must happen in draw

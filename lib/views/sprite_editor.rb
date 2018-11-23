@@ -19,13 +19,14 @@ class AuthorEngine
 
     def setup
       @pixels = []
-      @sprites= []
       @active_color = Gosu::Color.rgba(101,1,101, 255)
 
       create_grid(16, 16, 4)
       @canvas_changed = false
       @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
       @sprites_picker = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
+
+      @sprites= Array.new(@sprites_picker.rows*@sprites_picker.columns, nil)
 
       @tools = []
       @pixel_lock = false
@@ -44,7 +45,7 @@ class AuthorEngine
         end
       end
 
-      @tools << Button.new(image: "assets/ui/pencil_icon.png", tooltip: "Toggle pencil/bucket", x: @palette.x + @tools.first.width, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
+      @tools << Button.new(image: "assets/ui/pencil_icon.png", tooltip: "Toggle pencil/bucket", x: @palette.x + @tools.first.width + 1, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
         @pencil_icon ||= b.image
         @bucket_icon ||= AuthorEngine::Image.new("assets/ui/bucket_icon.png", retro: true)
 
@@ -93,6 +94,8 @@ class AuthorEngine
       @grid_width = x * size
       @grid_height = y * size
       @grid_pixel_size = size
+      @grid_columns = x
+      @grid_row     = y
 
       y.times do |_y|
         x.times do |_x|
@@ -146,7 +149,7 @@ class AuthorEngine
       y = normalize_y(y)
       return if (x < 0 || y < 0)
 
-      @pixels[(x + @grid_pixel_size * y)]
+      @pixels[(x + (@grid_columns * y))]
     end
 
     def normalize_x(int)
@@ -190,6 +193,31 @@ class AuthorEngine
       @sprites
     end
 
+    def set_sprite
+      if @sprites[@sprites_picker.active_sprite]
+        sprite_pixels(@sprites[@sprites_picker.active_sprite])
+      else
+        @pixels.each do |pixel|
+          pixel.color = BLANK_COLOR
+        end
+      end
+    end
+
+    def sprite_pixels(image)
+      pixels = []
+      image.to_blob.bytes.to_a.each_slice(4).each_with_index do |pixel|
+        buffer = []
+        pixel.each do |chunk|
+          buffer << Integer(chunk)
+        end
+        pixels << buffer
+      end
+
+      pixels.each_with_index do |pixel, index|
+        @pixels[index].color = Gosu::Color.rgba(pixel[0], pixel[1], pixel[2], pixel[3])
+      end
+    end
+
     def update_sprite
       list = []
 
@@ -205,16 +233,26 @@ class AuthorEngine
         end
       end
 
-      if @sprites[@sprites_picker.active_sprite]
-        @sprites[@sprites_picker.active_sprite] = nil # release image for garbage collection?
-        @sprites[@sprites_picker.active_sprite] = image
-      else
-        @sprites.insert(@sprites_picker.active_sprite, image)
-      end
+      @sprites[@sprites_picker.active_sprite] = nil # release image for garbage collection?
+      @sprites[@sprites_picker.active_sprite] = image
       @canvas_changed = false
     end
 
     def build_sprite_sheet
+      sheet = Gosu.render(512, 128, retro: true) do
+        @sprites.each_slice(512/16).each_with_index do |row, y|
+          row.each_with_index do |sprite, x|
+            p sprite
+            next if sprite.nil?
+            sprite.draw(x * 16, y * 16, 0)
+          end
+        end
+      end
+
+      sheet.save("sheet.png")
+    end
+
+    def import_sprite_sheet(file)
     end
 
     def button_up(id)
@@ -231,6 +269,8 @@ class AuthorEngine
           floodfill(pixel, pixel.color, BLANK_COLOR) if id == Gosu::MsRight
         end
       end
+
+      build_sprite_sheet if id == Gosu::KbS && window.control_button_down?
 
       update_sprite if (id == Gosu::MsLeft || id == Gosu::MsRight) && @canvas_changed
     end
