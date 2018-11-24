@@ -52,10 +52,12 @@ class AuthorEngine
     end
 
     def format_error(text:, error:)
+      puts "#{error.class}: #{error.message}"
+      puts error.backtrace.join("\n")
+
       max_width = window.width - (@x_padding*2)
       char_width= text.font.text_width("0")
       chars_line= (max_width.to_f / char_width.to_f).ceil
-      p chars_line
 
       backtrace = "<c=#{xml_color(orange)}>#{error.class}</c>\nBacktrace:\n"
       error.backtrace.each {|trace| next unless trace.include?("(eval)"); backtrace+="  #{trace}\n"}
@@ -65,7 +67,6 @@ class AuthorEngine
       trace_buffer.lines do |line|
         line.chomp.chars.each_slice(chars_line).each do |slice|
           string = slice.join
-          p string
           buffer += "  #{string}\n"
         end
       end
@@ -75,9 +76,7 @@ class AuthorEngine
 
     def focus
       window.caption = "Play"
-      if Gosu.milliseconds > 100
-        play
-      end
+      play
     end
 
     def play

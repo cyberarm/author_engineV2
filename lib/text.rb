@@ -32,7 +32,7 @@ class AuthorEngine
     end
 
     def draw_markup
-      @font.draw_text(@message, @x, @y, @z, 1, 1, @color)
+      @font.draw_markup(@message, @x, @y, @z, 1, 1, @color)
     end
 
     def update

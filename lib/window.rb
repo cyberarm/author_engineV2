@@ -35,8 +35,14 @@ class AuthorEngine
     end
 
     def setup
-      @container = Container.new
-      @container.setup
+      self.container=(Editor.new)#Loader.new
+    end
+
+    def container=(container)
+      if container.is_a?(Container)
+        @container = container
+        @container.setup
+      end
     end
 
     def calculate_scale
