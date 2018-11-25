@@ -122,6 +122,8 @@ class AuthorEngine
       end
 
       def calculate_x_and_y
+        @y = @text.y + (@active_line * @text.height)
+
         if position == 0
           @x = 0
           return
@@ -134,7 +136,6 @@ class AuthorEngine
         end
 
         @x = @text.font.markup_width(sub_text)
-        @y = @text.y + (@active_line * @text.height)
       end
 
       def calculate_x_offset
@@ -185,7 +186,7 @@ class AuthorEngine
       end
 
       def highlight_activeline
-        Gosu.draw_rect(0 - @view.x_offset, @text.y + (@active_line * @text.height), @view.width, @text.height, @highlight_color)
+        Gosu.draw_rect(0 - @view.x_offset, @y, @view.width, @text.height, @highlight_color)
       end
 
       def highlight_selection
