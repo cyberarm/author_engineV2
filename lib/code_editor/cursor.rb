@@ -161,13 +161,21 @@ class AuthorEngine
       end
 
       def caret_stay_left_of_last_newline
+        @text_input.text+="\n" unless @text_input.text.end_with?("\n")
+
         eof = @text_input.text.chomp.length
         set_position(eof) if position > eof
       end
 
       def make_visible
+        old_y_offset   = @view.y_offset
+
         @view.y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
-        @view.y_offset = 0 if @view.y_offset > 0
+        if @view.y_offset > 0 # top is visible, reset to 0 to prevent inverse scrolling
+          @view.y_offset = 0
+        # elsif @y.between?(@text.y + @text.height*2, 0) # don't follow cursor up if not at top of screen
+        #   @view.y_offset = old_y_offset
+        end
       end
 
       def update_active_line_history
