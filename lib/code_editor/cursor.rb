@@ -168,14 +168,23 @@ class AuthorEngine
       end
 
       def make_visible
-        old_y_offset   = @view.y_offset
+        y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
 
-        @view.y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
-        if @view.y_offset > 0 # top is visible, reset to 0 to prevent inverse scrolling
-          @view.y_offset = 0
-        # elsif @y.between?(@text.y + @text.height*2, 0) # don't follow cursor up if not at top of screen
-        #   @view.y_offset = old_y_offset
+        if y_offset > 0 # top is visible, reset to 0 to prevent inverse scrolling
+          y_offset = 0
+        else
+          # FIXME
+          # top    = ((@y - @text.y) - (@view.height + y_offset)) + @text.height * 2
+          # bottom = ((@text.y + @view.height) + y_offset) + @text.height * 2
+
+          # puts "Y: #{@y}, top: #{top}, bottom: #{bottom}, y_offset: #{y_offset}"
+          # if (@y).between?(top, bottom) # don't follow cursor up if not at top of screen
+          #   puts "true"
+          #   y_offset = @view.y_offset
+          # end
         end
+
+        @view.y_offset = y_offset
       end
 
       def update_active_line_history
