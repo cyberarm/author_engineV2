@@ -24,6 +24,8 @@ class AuthorEngine
 
         @highlight_color = Gosu::Color.rgba(dark_gray.red, dark_gray.green, dark_gray.blue, 100)
         @selection_color = Gosu::Color.rgba(blue.red, blue.green, blue.blue, 100)
+
+        caret_stay_left_of_last_newline
       end
 
       def draw
@@ -49,6 +51,8 @@ class AuthorEngine
         # CAUTION: This randomly started working!
         #          And then stopped...?
 
+        caret_stay_left_of_last_newline
+
         case id
         when Gosu::MsLeft
           return unless @view.mouse_inside_view?
@@ -61,12 +65,14 @@ class AuthorEngine
 
           set_position(pos)
 
+        # TODO: move to button_down? to fix popping to the top and back
         when Gosu::KbHome
           line = @newline_data[last_active_line(0)]
           pos  = line[:position_end_of_line] - line[:text_length]
 
           set_position(pos)
 
+        # TODO: move to button_down? to fix popping to the bottom and back
         when Gosu::KbEnd
           line = @newline_data[last_active_line(@newline_data.size-1)]
           pos  = line[:position_end_of_line]
@@ -152,6 +158,11 @@ class AuthorEngine
 
         calculate_x_and_y
         calculate_x_offset
+      end
+
+      def caret_stay_left_of_last_newline
+        eof = @text_input.text.chomp.length
+        set_position(eof) if position > eof
       end
 
       def make_visible
