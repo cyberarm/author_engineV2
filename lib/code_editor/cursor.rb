@@ -174,14 +174,14 @@ class AuthorEngine
           y_offset = 0
         else
           # FIXME
-          # top    = ((@y - @text.y) - (@view.height + y_offset)) + @text.height * 2
-          # bottom = ((@text.y + @view.height) + y_offset) + @text.height * 2
+          top    = (@text.y + @view.y_offset.abs) + @text.height
+          bottom = (@text.y + @view.y_offset.abs + @view.height) - @text.height * 2
 
-          # puts "Y: #{@y}, top: #{top}, bottom: #{bottom}, y_offset: #{y_offset}"
-          # if (@y).between?(top, bottom) # don't follow cursor up if not at top of screen
-          #   puts "true"
-          #   y_offset = @view.y_offset
-          # end
+          if (@y).between?(top, bottom) # don't follow cursor up if not at top of screen
+            y_offset = @view.y_offset
+          elsif @y < top && y_offset <= 0
+            y_offset = @view.y_offset + @text.height
+          end
         end
 
         @view.y_offset = y_offset

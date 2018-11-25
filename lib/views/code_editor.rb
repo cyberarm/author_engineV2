@@ -102,7 +102,7 @@ end
       cursor_pos = @text_input.caret_pos # get a copy of the current cursor location
 
       if id == Gosu::KbEnter || id == Gosu::KbReturn
-        raise if @caret_pos != @text_input.caret_pos
+        # raise if @caret_pos != @text_input.caret_pos
         @text_input.text = @text_input.text.insert(@text_input.caret_pos, "\n")
         @cursor.set_position(cursor_pos+1)
       end
