@@ -1,8 +1,10 @@
 class AuthorEngine
   class Editor < Container
-    attr_reader :header_height
+    attr_reader :header_height, :savefile
 
-    def initialize
+    def initialize(savefile)
+      @savefile = savefile
+
       @scale_x = window.scale_x
       @scale_y = window.scale_y
 
@@ -71,6 +73,8 @@ class AuthorEngine
     end
 
     def button_up(id)
+      @savefile.save if window.control_button_down? && id == Gosu::KbS
+
       @buttons.each {|b| b.button_up(id)} unless @locked
 
       @active_view.button_up(id) if @active_view

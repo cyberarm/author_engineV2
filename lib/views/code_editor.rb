@@ -42,7 +42,11 @@ end
       @line_numbers_width   = @font.text_width(@line_numbers_spacing)
 
       @text_input = CodeInput.new
-      @text_input.text = DEFAULT_STRING
+      if window.container.savefile.code.nil?
+        @text_input.text = DEFAULT_STRING
+      else
+        @text_input.text = window.container.savefile.code
+      end
       @text = AuthorEngine::Text.new(message: "", size: @font_size, x: @line_numbers_width+@x_padding, y: window.container.header_height, font: Text::FONT_DEFAULT) # "DejaVu Sans Mono"
 
       @cursor = Cursor.new(view: self, text_input: @text_input, text: @text)

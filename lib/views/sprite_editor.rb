@@ -57,6 +57,8 @@ class AuthorEngine
           b.image = @pencil_icon
         end
       end
+
+      import_spritesheet(window.container.savefile.sprites)
     end
 
     def focus
@@ -238,21 +240,29 @@ class AuthorEngine
       @canvas_changed = false
     end
 
-    def build_sprite_sheet
+    def spritesheet
       sheet = Gosu.render(512, 128, retro: true) do
         @sprites.each_slice(512/16).each_with_index do |row, y|
           row.each_with_index do |sprite, x|
-            p sprite
             next if sprite.nil?
             sprite.draw(x * 16, y * 16, 0)
           end
         end
       end
 
-      sheet.save("sheet.png")
+      return sheet
     end
 
-    def import_sprite_sheet(file)
+    def import_spritesheet(data)
+      return if data.to_blob.size < 4
+      sprites = Gosu::Image.load_tiles(data, 16, 16, retro: true, tileable: true)
+      @sprites.clear
+
+      sprites.each do |sprite|
+        @sprites.push(sprite)
+      end
+
+      set_sprite
     end
 
     def button_up(id)
@@ -269,8 +279,6 @@ class AuthorEngine
           floodfill(pixel, pixel.color, BLANK_COLOR) if id == Gosu::MsRight
         end
       end
-
-      build_sprite_sheet if id == Gosu::KbS && window.control_button_down?
 
       update_sprite if (id == Gosu::MsLeft || id == Gosu::MsRight) && @canvas_changed
     end

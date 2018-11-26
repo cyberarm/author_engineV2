@@ -35,7 +35,7 @@ class AuthorEngine
     end
 
     def setup
-      self.container=(Editor.new)#Loader.new
+      self.container=(Loader.new)
     end
 
     def container=(container)
@@ -95,9 +95,9 @@ class AuthorEngine
     end
 
     def save_and_exit
-      # SpriteEditor.instance.build_sprite_sheet.save("PATH/spritesheet.png")
-      # LevelEditor.instance.save("PATH/levels.file_extension")
-      # CodeEditor.instance.save("PATH/main.rb")
+      if @container.is_a?(Editor)
+        @container.savefile.save
+      end
 
       close
     end
