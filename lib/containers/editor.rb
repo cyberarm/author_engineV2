@@ -74,6 +74,10 @@ class AuthorEngine
 
     def button_up(id)
       @savefile.save if window.control_button_down? && id == Gosu::KbS
+      if window.control_button_down? && id == Gosu::KbO
+        @savefile.save
+        window.container = Loader.new
+      end
 
       @buttons.each {|b| b.button_up(id)} unless @locked
 
