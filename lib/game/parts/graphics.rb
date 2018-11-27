@@ -19,10 +19,10 @@ class AuthorEngine
         font.draw_markup(text, x, y, z)
       end
 
-      def sprite(index, x = 0, y = 0, z = 0)
+      def sprite(index, x = 0, y = 0, z = 0, alpha = 255)
         image = SpriteEditor.instance.sprites[index]
         raise "No sprite at '#{index}'!" unless image
-        image.draw(x, y, z)
+        image.draw(x, y, z, 1,1, Gosu::Color.rgba(255,255,255, alpha))
       end
 
       def translate(x, y, &block)
