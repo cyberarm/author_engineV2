@@ -60,7 +60,7 @@ class AuthorEngine
           index = row_at(window.mouse_y)
           line  = @newline_data.dig(index)
           return unless line # no line at index
-          right_offset = column_at(window.mouse_x - @text.x, window.mouse_y)
+          right_offset = column_at((window.mouse_x + @view.x_offset.abs) - @text.x, window.mouse_y)
           pos = (line[:position_end_of_line] - line[:text_length]) + right_offset
 
           set_position(pos)

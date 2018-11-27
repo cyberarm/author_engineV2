@@ -23,15 +23,16 @@ class AuthorEngine
       @rows    = (@height / @scaled_sprite_size).floor
 
       @offset = 1 * window.square_scale
+      @tooltip = AuthorEngine::Text.new(message: "", z: 100)
     end
 
     def draw
-      # Gosu.clip_to(@x, @y, @width, @height) do
-        Gosu.draw_rect(@x-@offset, @y-@offset, @width+(@offset*2), @height+(@offset*2), Gosu::Color::WHITE, 15)
-        Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color.rgba(10, 10, 10, 200), 15)
-        draw_grid
-        draw_sprites
-      # end
+      Gosu.draw_rect(@x-@offset, @y-@offset, @width+(@offset*2), @height+(@offset*2), Gosu::Color::WHITE, 15)
+      Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color.rgba(10, 10, 10, 200), 15)
+      draw_grid
+      draw_sprites
+
+      draw_and_update_tooltip
     end
 
     def draw_grid
@@ -72,13 +73,30 @@ class AuthorEngine
       end
     end
 
-    def update
-    end
-
     def mouse_over_sprite?(x, y, width, height)
       if window.mouse_x.between?(x, x + width) &&
          window.mouse_y.between?(y, y + height)
          return true
+      end
+    end
+
+    def draw_and_update_tooltip
+      found = false
+      sprite_block do |x,y,index|
+        if @tooltip
+          @tooltip.message = "#{index}"
+          @tooltip.x = window.mouse_x - @tooltip.width/2
+          @tooltip.y = window.mouse_y - @tooltip.height
+        end
+
+        found = true
+      end
+
+      if found
+        Gosu.draw_rect(@tooltip.x - @offset, @tooltip.y - @offset, @tooltip.width+(@offset*2), @tooltip.height+(@offset), Gosu::Color.rgba(0,0,0,100), 100)
+        @tooltip.draw
+      else
+        @tooltip.message = ""
       end
     end
 
