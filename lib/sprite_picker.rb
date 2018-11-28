@@ -16,14 +16,13 @@ class AuthorEngine
 
       @x = x ? x : window.width/2 - @width/2
 
-      p (@width  / @scaled_sprite_size).floor
-      p (@height / @scaled_sprite_size).floor
-
       @columns = (@width  / @scaled_sprite_size).floor
       @rows    = (@height / @scaled_sprite_size).floor
 
       @offset = 1 * window.square_scale
       @tooltip = AuthorEngine::Text.new(message: "", z: 100)
+
+      @page = 0
     end
 
     def draw
@@ -51,7 +50,10 @@ class AuthorEngine
       y = @y
       x = @x
       n = 0
-      SpriteEditor.instance.sprites.each_with_index do |sprite, i|
+      size  = (@columns * @rows)
+      index = size * @page
+
+      SpriteEditor.instance.sprites[index..(index + size)].each_with_index do |sprite, i|
         sprite.draw(x, y, 16, 1.0 * window.square_scale, 1.0 * window.square_scale) if sprite
         x+=@scaled_sprite_size
 
@@ -82,6 +84,7 @@ class AuthorEngine
 
     def draw_and_update_tooltip
       found = false
+
       sprite_block do |x,y,index|
         if @tooltip
           @tooltip.message = "#{index}"
@@ -109,7 +112,8 @@ class AuthorEngine
 
     def sprite_block(&block)
       found = false
-      index = 0
+      index = @page * (@columns * @rows)
+
       @rows.times do |y|
         _y = y * @scaled_sprite_size
         break if found
@@ -123,6 +127,7 @@ class AuthorEngine
             block.call(_x, _y, index, found) if block
           end
 
+          break if index >= 255
           index+=1
         end
       end
@@ -134,6 +139,12 @@ class AuthorEngine
         if mouse_over?(self)
           select_sprite
         end
+      when Gosu::KbLeft
+        @page-=1
+        @page = 0 if @page < 0
+      when Gosu::KbRight
+        @page+=1
+        @page = (255/(@rows * @columns)) if @page > (255/(@rows * @columns))
       end
     end
   end
