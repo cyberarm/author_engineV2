@@ -41,7 +41,6 @@ class AuthorEngine
         end
 
         update_caret
-        make_visible
 
         update_active_line_history
       end
@@ -158,6 +157,7 @@ class AuthorEngine
 
         calculate_x_and_y
         calculate_x_offset
+        calculate_y_offset
       end
 
       def caret_stay_left_of_last_newline
@@ -167,7 +167,7 @@ class AuthorEngine
         set_position(eof) if position > eof
       end
 
-      def make_visible
+      def calculate_y_offset
         y_offset = @view.height - ((@text.y - (window.container.header_height - (@text.height*2))) + (@active_line * @text.height))
 
         if y_offset > 0 # top is visible, reset to 0 to prevent inverse scrolling

@@ -86,7 +86,8 @@ class AuthorEngine
       when Gosu::KbDown
         @list.rotate!(1)
         @index+=1
-        @index = @index % @list.size-1
+        @index = 0 if @list.size == 0
+        @index = @index % @list.size-1 if @list.size != 0
       when Gosu::KbEnter, Gosu::KbReturn
         if @entering_name
           SaveFile.create(window.text_input.text.strip+".authorengine")
