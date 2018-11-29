@@ -23,8 +23,10 @@ class AuthorEngine
 
       create_grid(16, 16, 4)
       @canvas_changed = false
+      @scale = 1 * window.square_scale
       @palette = Palette.new(x: @grid_x + @grid_width + @grid_pixel_size, y: @grid_y)
       @sprites_picker = SpritePicker.new(y: @grid_y + @grid_height + (@grid_pixel_size * 2))
+      @coordinates    = Text.new(message: "1:1", x: @scale, y: @grid_y)
 
       @sprites= Array.new(@sprites_picker.rows*@sprites_picker.columns, nil)
 
@@ -45,10 +47,10 @@ class AuthorEngine
         end
       end
 
-      @tools << Button.new(image: "assets/ui/pencil_icon.png", tooltip: "Toggle pencil/bucket", x: @palette.x + @tools.first.width + 1, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
-        @pencil_icon ||= b.image
-        @bucket_icon ||= AuthorEngine::Image.new("assets/ui/bucket_icon.png", retro: true)
+      @pencil_icon = AuthorEngine::Image.new("assets/ui/pencil_icon.png", retro: true)
+      @bucket_icon = AuthorEngine::Image.new("assets/ui/bucket_icon.png", retro: true)
 
+      @tools << Button.new(image: @pencil_icon, tooltip: "Toggle pencil/bucket", x: @palette.x + @tools.first.width + 1, y: @palette.y + @palette.height + (window.square_scale * 2), color: dark_purple) do |b|
         @pixel_floodfill = !@pixel_floodfill
 
         if @pixel_floodfill
@@ -70,6 +72,7 @@ class AuthorEngine
       super
       @pixels.each(&:draw)
       highlight_pixel
+      @coordinates.draw
 
       Gosu.draw_rect(@grid_x-window.square_scale, @grid_y-window.square_scale, @grid_width+(window.square_scale*2), @grid_height+(window.square_scale*2), Gosu::Color::WHITE)
       Gosu.draw_rect(@grid_x, @grid_y, @grid_width, @grid_height, Gosu::Color.rgba(10, 10, 10, 200))
@@ -77,6 +80,12 @@ class AuthorEngine
       @sprites_picker.draw
 
       @tools.each(&:draw)
+
+      if @pixel_floodfill
+        @bucket_icon.draw(window.mouse_x, window.mouse_y - (@bucket_icon.width * @scale), 1000, @scale, @scale)
+      else
+        @pencil_icon.draw(window.mouse_x, window.mouse_y - (@pencil_icon.width * @scale), 1000, @scale, @scale)
+      end
     end
 
     def update
@@ -86,6 +95,17 @@ class AuthorEngine
         erase if Gosu.button_down?(Gosu::MsRight)
       end
       @palette.update
+
+      update_coordinates
+    end
+
+    def update_coordinates
+      x = normalize_x(window.mouse_x)
+      y = normalize_y(window.mouse_y)
+      return if (x >= @grid_columns || y >= @grid_rows)
+      return if (x < 0 || y < 0)
+
+      @coordinates.message = "#{x+1}:#{y+1}"
     end
 
     def create_grid(x, y, size)
@@ -97,7 +117,7 @@ class AuthorEngine
       @grid_height = y * size
       @grid_pixel_size = size
       @grid_columns = x
-      @grid_row     = y
+      @grid_rows    = y
 
       y.times do |_y|
         x.times do |_x|

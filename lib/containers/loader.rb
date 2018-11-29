@@ -13,7 +13,7 @@ class AuthorEngine
         @list << Project.new(file, proc {load(file)})
       end
 
-      @index = ((@list.size)/2.0).round
+      @index = ((@list.size)/2.0).floor
       @list.rotate!(@index)
       @height = (@list.size-1)*@font.height
 
