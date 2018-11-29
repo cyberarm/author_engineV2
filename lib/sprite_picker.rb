@@ -21,6 +21,7 @@ class AuthorEngine
 
       @offset = 1 * window.square_scale
       @tooltip = AuthorEngine::Text.new(message: "", z: 100)
+      @current_page = AuthorEngine::Text.new(message: "Page 0", size: 20, x: window.width/2, y: @y - 24, z: 100)
 
       @page = 0
     end
@@ -32,6 +33,8 @@ class AuthorEngine
       draw_sprites
 
       draw_and_update_tooltip
+      @current_page.message = "Page #{@page}"
+      @current_page.draw
     end
 
     def draw_grid
@@ -141,10 +144,10 @@ class AuthorEngine
         end
       when Gosu::KbLeft
         @page-=1
-        @page = 0 if @page < 0
+        @page = (255/(@rows * @columns)) if @page < 0
       when Gosu::KbRight
         @page+=1
-        @page = (255/(@rows * @columns)) if @page > (255/(@rows * @columns))
+        @page = 0 if @page > (255/(@rows * @columns))
       end
     end
   end
