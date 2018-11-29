@@ -53,7 +53,11 @@ class AuthorEngine
       @buffer+="\n"
 
       pack = sheet.to_blob.unpack('H*').first
-      @buffer+= pack
+      # @buffer+= pack
+      pack.chars.each_slice(1024) do |slice|
+        @buffer+=slice.join
+        @buffer+="\n"
+      end
 
       @buffer+="\n"
     end
