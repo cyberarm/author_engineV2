@@ -14,13 +14,13 @@ A virtual console¹ that you code in Ruby.
 
 # Interface
 ## Play
-![play_view](#)
+![play_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/play.png)
 ## Sprite Editor
-![sprite_editor_view](#)
+![sprite_editor_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/sprite_editor.png)
 ## Level Editor
 ![level_editor_view](#)
 ## Code Editor
-![code_editor_view](#)
+![code_editor_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/code_editor.png)
 
 
 ¹: Does not directly run any kind of assembly
