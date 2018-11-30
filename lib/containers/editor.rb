@@ -72,6 +72,12 @@ class AuthorEngine
       @active_view.update if @active_view
     end
 
+    def close
+      @savefile.save
+
+      window.close!
+    end
+
     def button_down(id)
       @savefile.save if window.control_button_down? && id == Gosu::KbS
       if window.control_button_down? && id == Gosu::KbO

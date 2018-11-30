@@ -30,7 +30,7 @@ class AuthorEngine
 
       def draw
         highlight_activeline
-        # highlight_selection
+        highlight_selection
         Gosu.draw_rect(@text.x + @x, @y, 1, @text.height, light_gray) if @show
       end
 
@@ -43,6 +43,13 @@ class AuthorEngine
         update_caret
 
         update_active_line_history
+      end
+
+      def button_down(id)
+        case id
+        when Gosu::KbA
+          select_all if window.control_button_down?
+        end
       end
 
       def button_up(id)
@@ -218,11 +225,20 @@ class AuthorEngine
       end
 
       def highlight_selection
-        line      = @newline_data[@active_line]
-        selection = 1000
-        selection_x = @text.font.text_width(substring)
+        return if @text_input.selection_start == position
 
-        Gosu.draw_rect(@x, @text.y + (@active_line * @text.height), selection_x, @text.height, @selection_color)
+        line      = @newline_data[@active_line]
+        selection_x = 0
+        if @text_input.selection_start < position
+          selection_x = @text.font.text_width(@text_input.text[@text_input.selection_start..position-1])
+
+          Gosu.draw_rect((@x + @text.x) - selection_x, @text.y + (@active_line * @text.height), selection_x, @text.height, @selection_color)
+        else
+          selection_x = @text.font.text_width(@text_input.text[position..@text_input.selection_start-1])
+
+          Gosu.draw_rect((@x + @text.x), @text.y + (@active_line * @text.height), selection_x, @text.height, @selection_color)
+        end
+
       end
 
       def position

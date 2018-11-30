@@ -99,7 +99,15 @@ class AuthorEngine
         @container.savefile.save
       end
 
-      close
+      close!
+    end
+
+    def close
+      if @container
+        @container.close
+      else
+        super
+      end
     end
 
     def button_down(id)

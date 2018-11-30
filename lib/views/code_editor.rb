@@ -102,6 +102,10 @@ end
 
     def code; @text_input.text; end
 
+    def button_down(id)
+      @cursor.button_down(id)
+    end
+
     def button_up(id)
       cursor_pos = @text_input.caret_pos # get a copy of the current cursor location
 
@@ -142,10 +146,6 @@ end
           p cursor_pos+2
           @cursor.set_position(cursor_pos+2)
         end
-      end
-
-      if id == Gosu::KbA && window.control_button_down?
-        @cursor.select_all
       end
 
       @cursor.button_up(id)

@@ -74,6 +74,10 @@ class AuthorEngine
     def update
     end
 
+    def close
+      window.close!
+    end
+
     def button_up(id)
       @new_button.button_up(id)
 
