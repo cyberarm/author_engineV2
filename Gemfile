@@ -1,3 +1,6 @@
 source "https://rubygems.org"
 
-gem "gosu"
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+
+# Specify your gem's dependencies in author_engine.gemspec
+gemspec

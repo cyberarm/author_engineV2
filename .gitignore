@@ -1,2 +1,11 @@
-*.authorengine
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
 _*.rb
+*.authorengine

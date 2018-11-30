@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "author_engine"
+AuthorEngine::Window.new.show
