@@ -111,10 +111,14 @@ class AuthorEngine
     end
 
     def button_down(id)
+      super
+
       @container.button_down(id)
     end
 
     def button_up(id)
+      super
+
       if id == Gosu::KbEscape
         @close_counter += 1
         save_and_exit if @close_counter == 2

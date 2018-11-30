@@ -81,10 +81,12 @@ class AuthorEngine
 
       @tools.each(&:draw)
 
-      if @pixel_floodfill
-        @bucket_icon.draw(window.mouse_x, window.mouse_y - (@bucket_icon.width * @scale), 1000, @scale, @scale)
-      else
-        @pencil_icon.draw(window.mouse_x, window.mouse_y - (@pencil_icon.width * @scale), 1000, @scale, @scale)
+      Gosu.clip_to(@grid_x, @grid_y, @grid_width, @grid_height) do
+        if @pixel_floodfill
+          @bucket_icon.draw(window.mouse_x, window.mouse_y - (@bucket_icon.width * @scale), 1000, @scale, @scale)
+        else
+          @pencil_icon.draw(window.mouse_x, window.mouse_y - (@pencil_icon.width * @scale), 1000, @scale, @scale)
+        end
       end
     end
 
@@ -190,6 +192,7 @@ class AuthorEngine
       return unless pixel
       return if pixel.color == replacement_color
       return if pixel.color != target_color
+      return if target_color != BLANK_COLOR && @pixel_lock # don't replace non-blank pixels with color if pixels are locked
 
       pixel.color = replacement_color
       @canvas_changed = true
@@ -316,10 +319,10 @@ class AuthorEngine
 
       @tools.each{ |b| b.button_up(id) }
 
-      if @pixel_floodfill && @palette.color
+      if @pixel_floodfill
         pixel = get_pixel_at(window.mouse_x, window.mouse_y)
         if pixel
-          floodfill(pixel, pixel.color, @palette.color) if id == Gosu::MsLeft
+          floodfill(pixel, pixel.color, @palette.color) if id == Gosu::MsLeft if @palette.color
           floodfill(pixel, pixel.color, BLANK_COLOR) if id == Gosu::MsRight
         end
       end

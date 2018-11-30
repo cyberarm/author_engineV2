@@ -64,7 +64,6 @@ class AuthorEngine
         @repeatable_keys.each do |key|
           if key[:down]
             if Gosu.milliseconds > key[:last_repeat] + key[:repeat_delay]
-              return unless Gosu.milliseconds > key[:down_at] + key[:repeat_delay]
               key[:action].call
               key[:last_repeat] = Gosu.milliseconds
             end
@@ -76,7 +75,7 @@ class AuthorEngine
         @repeatable_keys.detect do |key|
           if key[:key] == id
             key[:down] = true
-            key[:down_at] = Gosu.milliseconds
+            key[:last_repeat] = Gosu.milliseconds + key[:repeat_delay]
             return true
           end
         end

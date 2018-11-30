@@ -36,7 +36,7 @@ end
 
     attr_accessor :x_offset, :y_offset
     def setup
-      @font_size = 6 * window.square_scale.floor
+      @font_size = 5 * window.square_scale.floor
       @font = Gosu::Font.new(@font_size, name: Text::FONT_DEFAULT_BOLD) # "Consolas"
       @line_numbers_spacing = "00"
       @line_numbers_width   = @font.text_width(@line_numbers_spacing)
