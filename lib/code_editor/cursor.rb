@@ -253,7 +253,7 @@ class AuthorEngine
 
       def select_all
         @text_input.selection_start = 0
-        @text_input.caret_pos = @text_input.text.length
+        @text_input.caret_pos = @text_input.text.length-1
       end
 
       def move(direction)
