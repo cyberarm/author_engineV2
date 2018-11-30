@@ -151,8 +151,9 @@ class AuthorEngine
       end
 
       def calculate_x_offset
-        if @x + (window.square_scale * 6) > @view.width - @text.x
-          @view.x_offset = (@view.width - @text.x) - (@x + (window.square_scale * 6))
+        two_zeros = @text.font.text_width("00")
+        if @x + two_zeros > @view.width - @text.x
+          @view.x_offset = (@view.width - @text.x) - (@x + two_zeros)
         else
           @view.x_offset = 0
         end
