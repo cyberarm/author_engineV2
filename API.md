@@ -14,7 +14,7 @@ end
 def draw
   rect(@x, @y, width, height, black, @z)
   sprite(@birdie, @x, @y, @z)
-  text("string", @x, @y, @z)
+  text("string", @x, @y, 10, @z, white)
 end
 
 def update
@@ -32,10 +32,16 @@ end
 ### height
   Virtual display height (e.g. 128)
 
+### fps
+  Current Frames Per Second
+
+### milliseconds
+  Milliseconds since game started
+
 # Graphics
 ### rect(x = 0, y = 0, width = 1, height = 1, color = white, z = 0)
 ### sprite(sprite_sheet_index, x = 0, y = 0, z = 0, color = white)
-### text(string, x = 0, y = 0, size = 4, z = 0)
+### text(string, x = 0, y = 0, size = 4, z = 0, color = white)
 
 ### translate(x, y, &block)
   Translate the contents of block by x and y

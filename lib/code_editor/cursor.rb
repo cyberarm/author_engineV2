@@ -23,7 +23,7 @@ class AuthorEngine
         @active_line_history = []
 
         @highlight_color = Gosu::Color.rgba(dark_gray.red, dark_gray.green, dark_gray.blue, 100)
-        @selection_color = Gosu::Color.rgba(blue.red, blue.green, blue.blue, 100)
+        @selection_color = window.lighten(Gosu::Color.rgba(@view.background.red, @view.background.green, @view.background.blue, 100), 100)
 
         caret_stay_left_of_last_newline
       end
@@ -151,8 +151,8 @@ class AuthorEngine
       end
 
       def calculate_x_offset
-        if @x + window.square_scale > @view.width - @text.x
-          @view.x_offset = (@view.width - @text.x) - (@x + window.square_scale)
+        if @x + (window.square_scale * 6) > @view.width - @text.x
+          @view.x_offset = (@view.width - @text.x) - (@x + (window.square_scale * 6))
         else
           @view.x_offset = 0
         end
