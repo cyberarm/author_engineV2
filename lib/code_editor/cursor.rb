@@ -25,6 +25,23 @@ class AuthorEngine
         @highlight_color = Gosu::Color.rgba(dark_gray.red, dark_gray.green, dark_gray.blue, 100)
         @selection_color = window.lighten(Gosu::Color.rgba(@view.background.red, @view.background.green, @view.background.blue, 100), 100)
 
+        @repeatable_keys = [
+          {
+            key: Gosu::KbUp,
+            down: false,
+            repeat_delay: 50,
+            last_repeat: 0,
+            action: proc {move(:up)}
+          },
+          {
+            key: Gosu::KbDown,
+            down: false,
+            repeat_delay: 50,
+            last_repeat: 0,
+            action: proc {move(:down)}
+          }
+        ]
+
         caret_stay_left_of_last_newline
       end
 
@@ -43,9 +60,27 @@ class AuthorEngine
         update_caret
 
         update_active_line_history
+
+        @repeatable_keys.each do |key|
+          if key[:down]
+            if Gosu.milliseconds > key[:last_repeat] + key[:repeat_delay]
+              return unless Gosu.milliseconds > key[:down_at] + key[:repeat_delay]
+              key[:action].call
+              key[:last_repeat] = Gosu.milliseconds
+            end
+          end
+        end
       end
 
       def button_down(id)
+        @repeatable_keys.detect do |key|
+          if key[:key] == id
+            key[:down] = true
+            key[:down_at] = Gosu.milliseconds
+            return true
+          end
+        end
+
         case id
         when Gosu::KbA
           select_all if window.control_button_down?
@@ -53,6 +88,13 @@ class AuthorEngine
       end
 
       def button_up(id)
+        @repeatable_keys.detect do |key|
+          if key[:key] == id
+            key[:down] = false
+            return true
+          end
+        end
+
         # FIXME: Can't seem to get cursor position before it's set to 0...
         # CAUTION: This randomly started working!
         #          And then stopped...?
