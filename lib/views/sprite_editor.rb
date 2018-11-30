@@ -260,6 +260,23 @@ class AuthorEngine
       @canvas_changed = false
     end
 
+    def copy_sprite
+      @copied_pixels = []
+      @pixels.each {|pixel| @copied_pixels << pixel.dup}
+    end
+
+    def paste_sprite
+      if @copied_pixels
+        @pixels.each_with_index do |pixel, i|
+          pixel.color = @copied_pixels[i].color
+        end
+        @canvas_changed = true
+        update_sprite
+      end
+
+      @copied_pixels = nil
+    end
+
     def spritesheet
       sheet = Gosu.render(512, 128, retro: true) do
         @sprites.each_slice(512/16).each_with_index do |row, y|
@@ -283,6 +300,13 @@ class AuthorEngine
       end
 
       set_sprite
+    end
+
+    def button_down(id)
+      super
+
+      copy_sprite  if window.control_button_down? && id == Gosu::KbC
+      paste_sprite if window.control_button_down? && id == Gosu::KbV
     end
 
     def button_up(id)

@@ -5,7 +5,7 @@ class AuthorEngine
         Gosu.draw_rect(x, y, width, height, color, z)
       end
 
-      def text(text, x = 0, y = 0, size = 4, z = 0)
+      def text(text, x = 0, y = 0, size = 4, z = 0, color = white)
         @fonts ||= {}
 
         font = nil
@@ -16,7 +16,7 @@ class AuthorEngine
           font = (@fonts[size] = Gosu::Font.new(size, name: Text::FONT_DEFAULT))
         end
 
-        font.draw_markup(text, x, y, z)
+        font.draw_markup(text, x, y, z, 1, 1, color)
       end
 
       def sprite(index, x = 0, y = 0, z = 0, alpha = 255)
