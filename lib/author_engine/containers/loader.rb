@@ -26,6 +26,14 @@ class AuthorEngine
         @entering_name = true
       end
       @new_button.x = window.width - @new_button.width
+
+      if ARGV[0] && File.exists?(ARGV[0])
+        if ARGV[0].end_with?(".authorengine")
+          load(ARGV[0])
+        else
+          puts "AuthorEngine: #{ARGV[0]} is not a compatible file."
+        end
+      end
     end
 
     def load(filename)
@@ -54,7 +62,6 @@ class AuthorEngine
       Gosu.draw_rect(0, @new_button.y, window.width, @new_button.height, @header_color)
       @font.draw_text("AuthorEngine", 1*window.square_scale,@font.height/2,0)
       @new_button.draw
-      @font.draw_text(@list[@index].name, 0, 0, 0) if @list[@index]
 
       Gosu.clip_to(0, @font.height*2, window.width, window.height-(@font.height*4)) do
         y = (window.height/2-@font.height) - (@height/2)
