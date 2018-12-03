@@ -23,7 +23,7 @@ class AuthorEngine
 
       @code, @sprites, @levels = nil, nil, nil
 
-      load
+      load unless RUBY_ENGINE == "opal"
     end
 
     def save

@@ -24,25 +24,29 @@ class AuthorEngine
         15 => Color.new(255, 204, 170)
       }
 
-      def black;       COLORS.dig(0); end
-      def dark_blue;   COLORS.dig(1); end
-      def dark_purple; COLORS.dig(2); end
-      def dark_green;  COLORS.dig(3); end
+      def black;       rgb(COLORS.dig(0)); end
+      def dark_blue;   rgb(COLORS.dig(1)); end
+      def dark_purple; rgb(COLORS.dig(2)); end
+      def dark_green;  rgb(COLORS.dig(3)); end
 
-      def brown;       COLORS.dig(4); end
-      def dark_gray;   COLORS.dig(5); end
-      def light_gray;  COLORS.dig(6); end
-      def white;       COLORS.dig(7); end
+      def brown;       rgb(COLORS.dig(4)); end
+      def dark_gray;   rgb(COLORS.dig(5)); end
+      def light_gray;  rgb(COLORS.dig(6)); end
+      def white;       rgb(COLORS.dig(7)); end
 
-      def red;         COLORS.dig(8); end
-      def orange;      COLORS.dig(9); end
-      def yellow;      COLORS.dig(10); end
-      def green;       COLORS.dig(11); end
+      def red;         rgb(COLORS.dig(8)); end
+      def orange;      rgb(COLORS.dig(9)); end
+      def yellow;      rgb(COLORS.dig(10)); end
+      def green;       rgb(COLORS.dig(11)); end
 
-      def blue;        COLORS.dig(12); end
-      def indigo;      COLORS.dig(13); end
-      def pink;        COLORS.dig(14); end
-      def peach;       COLORS.dig(15); end
+      def blue;        rgb(COLORS.dig(12)); end
+      def indigo;      rgb(COLORS.dig(13)); end
+      def pink;        rgb(COLORS.dig(14)); end
+      def peach;       rgb(COLORS.dig(15)); end
+
+      def rgb(color)
+        return "rgb(#{color.red}, #{color.green}, #{color.blue})"
+      end
 
       def xml_color(color)
         red   = color.red.to_s(16)
