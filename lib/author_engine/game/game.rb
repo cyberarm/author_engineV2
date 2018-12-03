@@ -6,12 +6,18 @@ class AuthorEngine
     include AuthorEngine::Part::Input
 
     def initialize(code:)
-      @background_color = Gosu::Color::BLACK
+      if RUBY_ENGINE == "opal"
+        @scale  = 1.0
+        @canvas = `document.getElementById('canvas')`
+        @canvas_context = `#{@canvas}.getContext('2d')`
+      end
+
+      @background_color = black
       self.instance_eval(code)
     end
 
     def draw_background
-      Gosu.draw_rect(0, 0, Window::VIEW_WIDTH, Window::VIEW_HEIGHT, @background_color)
+      rect(0, 0, width, height, @background_color)
     end
 
     def init
