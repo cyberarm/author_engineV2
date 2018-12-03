@@ -68,19 +68,23 @@ class AuthorEngine
       @buffer+="\n"
     end
 
-    def load
-      file = ""
-      File.open(@file, "r") {|f| file = f.read}
+    def load(from_file = true, data = nil)
+      string = ""
+      if from_file
+        File.open(@file, "r") {|f| string = f.read}
+      else
+        string = data
+      end
 
-      load_code(file)
-      load_spritesheet(file)
-      load_levels(file)
+      load_code(string)
+      load_spritesheet(string)
+      load_levels(string)
     end
 
-    def load_code(file)
+    def load_code(string)
       buffer = ""
       in_code= false
-      file.each_line do |line|
+      string.each_line do |line|
         if line.start_with?("___CODE___")
           in_code = true
           next
@@ -95,13 +99,13 @@ class AuthorEngine
       @code = buffer
     end
 
-    def load_spritesheet(file)
+    def load_spritesheet(string)
       buffer = ""
       width  = 0
       height = 0
       in_sprites = false
 
-      file.each_line do |line|
+      string.each_line do |line|
         if line.strip.start_with?("___SPRITES___")
           in_sprites = true
           next
@@ -128,7 +132,7 @@ class AuthorEngine
       @sprites = SpriteSheetData.new(width, height, stream)
     end
 
-    def load_levels(file)
+    def load_levels(string)
     end
   end
 end

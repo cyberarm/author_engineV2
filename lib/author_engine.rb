@@ -1,10 +1,10 @@
 require "gosu"
 require "coderay"
 
-require_relative "author_engine/game/parts/common"
-require_relative "author_engine/game/parts/graphics"
-require_relative "author_engine/game/parts/colors"
-require_relative "author_engine/game/parts/input"
+require_relative "author_engine/game/gosu/parts/common"
+require_relative "author_engine/game/gosu/parts/graphics"
+require_relative "author_engine/game/gosu/parts/colors"
+require_relative "author_engine/game/gosu/parts/input"
 
 require_relative "author_engine/window"
 require_relative "author_engine/support"
