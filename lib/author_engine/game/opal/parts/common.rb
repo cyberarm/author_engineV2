@@ -5,8 +5,8 @@ class AuthorEngine
       def height; 128; end
       def fps; 0; end
       def milliseconds
-        @__initial_milliseconds ||= `performance.now("game")`
-        `performance.now("game")` - @__initial_milliseconds
+        @__initial_milliseconds ||= `performance.now()`
+        `performance.now()` - @__initial_milliseconds
       end
     end
   end
