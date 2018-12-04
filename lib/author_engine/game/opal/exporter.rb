@@ -1,4 +1,4 @@
-require "erb"
+require "opal"
 
 class AuthorEngine
   class OpalExporter
@@ -15,61 +15,72 @@ class AuthorEngine
 
     def stylesheet
       %{
-        body {
-          margin: 0;
-          padding: 0;
-          background: #222;
-        }
-        #canvas {
-          display: block;
-          margin: 0 auto;
-        }
+body {
+  margin: 0;
+  padding: 0;
+  background: #222;
+}
+#canvas {
+  display: block;
+  margin: 0 auto;
+}
       }
     end
 
     def project
-      %x{
-        var projectString = "#{File.open(@project_file).read}";
+      %{
+var projectString = `#{File.open(@project_file).read}`;
       }
     end
 
     def opal_runtime
       program = %{
-        require "author_engine/opal"
+require "opal"
+require "opal-parser"
+require "author_engine/opal"
 
-        AuthorEngine::GameRunner.new(`projectString`).show
+AuthorEngine::GameRunner.new(`projectString`).show
       }
 
-      Opal.compile(program)
+      builder = Opal::Builder.new
+      base_path = File.expand_path("../../../..", __FILE__)
+      builder.append_paths("#{base_path}")
+
+      puts builder.compiler_options
+
+      puts "Transpiling to JavaScript using Opal..."
+      builder.build_require("author_engine/opal")
+      builder.build_str(program, "(inline)").to_s
     end
 
     def template
       %{
-        <!doctype html5>
-        <html>
-          <head>
-            <meta charset="utf-8" />
-            <title>#{project_name} | AuthorEngine</title
-          </head>
-          <style>
-            #{stylesheet}
-          </style>
-          <body>
-            <canvas id="canvas">
-              <h1>You're Browser Does Not Support HTML5 Canvas!</h1>
-            </canvas>
-          </body>
-          <script>
-            #{project}
+<!doctype html5>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>#{project_name} | AuthorEngine</title>
+  </head>
+  <style>
+    #{stylesheet}
+  </style>
+  <body>
+    <canvas id="canvas">
+      <h1>You're Browser Does Not Support HTML5 Canvas!</h1>
+    </canvas>
 
-            #{opal_runtime}
-          </script>
-        </html>
+    <script>
+      #{project}
+
+      #{opal_runtime}
+    </script>
+  </body>
+</html>
       }
     end
 
     def export
-      ERB.new(template).result(binding)
+      template
     end
 
     def save(string)
@@ -77,7 +88,8 @@ class AuthorEngine
       directory = File.expand_path(@project_file.sub(filename, ''))
       name      = filename.sub(".authorengine", "")
 
-      File.open("#{directory}/#{name}.html") do |file|
+      puts "Saving to \"#{directory}/#{name}.html\""
+      File.open("#{directory}/#{name}.html", "w") do |file|
         file.write(string)
       end
     end

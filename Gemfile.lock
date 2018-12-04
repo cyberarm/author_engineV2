@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    author_engine (0.1.0)
+    author_engine (0.2.0)
       coderay (~> 1.1.2)
       gosu (~> 0.14.4)
       opal (~> 0.11.4)
