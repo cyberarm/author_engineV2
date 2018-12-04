@@ -28,5 +28,4 @@ class AuthorEngine
 
     def update
     end
-  end
 end
