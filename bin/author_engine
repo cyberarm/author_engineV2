@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
 require "author_engine"
+require "author_engine/cli"
 # AuthorEngine::Window.new.show
 AuthorEngine::CLI.new
