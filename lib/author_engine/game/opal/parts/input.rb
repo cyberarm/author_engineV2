@@ -18,7 +18,7 @@ class AuthorEngine
         down = false
 
         if BUTTONS.dig(name)
-          down = KEY_STATES.dig(name) # dig returns false if key not found
+          down = KEY_STATES.dig(BUTTONS.dig(name)) # dig returns false if key not found
         else
           raise "Button '#{name}' not found!"
         end
