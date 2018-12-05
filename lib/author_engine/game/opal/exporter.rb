@@ -46,10 +46,13 @@ AuthorEngine::GameRunner.new(`projectString`).show
       base_path = File.expand_path("../../../..", __FILE__)
       builder.append_paths("#{base_path}")
 
-      puts builder.compiler_options
-
       puts "Transpiling to JavaScript using Opal..."
+
+
+      builder.build("opal")
+      builder.build("opal-parser")
       builder.build_require("author_engine/opal")
+
       builder.build_str(program, "(inline)").to_s
     end
 
