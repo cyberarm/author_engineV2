@@ -1,8 +1,8 @@
 class AuthorEngine
   class Text
     include Support
-    FONT_DEFAULT = "assets/fonts/Connection.otf"
-    FONT_DEFAULT_BOLD = "assets/fonts/ConnectionBold.otf"
+    FONT_DEFAULT      = "#{File.expand_path("../../../", __FILE__)}/assets/fonts/Connection.otf"
+    FONT_DEFAULT_BOLD = "#{File.expand_path("../../../", __FILE__)}/assets/fonts/ConnectionBold.otf"
 
     attr_accessor :message, :x, :y, :z, :color
     attr_reader :size, :font
