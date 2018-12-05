@@ -2,12 +2,12 @@ class AuthorEngine
   class Part
     module Input
       BUTTONS = {
-        "left"  => `ArrowLeft`,
-        "right" => `ArrowRight`,
-        "up"    => `ArrowUp`,
-        "down"  => `ArrowDown`,
-        "x"     => `KeyX`,
-        "y"     => `ArrowC`,
+        "left"  => "ArrowLeft",
+        "right" => "ArrowRight",
+        "up"    => "ArrowUp",
+        "down"  => "ArrowDown",
+        "x"     => "KeyX",
+        "y"     => "ArrowC",
       }
 
       # Store keys state

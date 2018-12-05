@@ -5,6 +5,7 @@ class AuthorEngine
     include AuthorEngine::Part::Graphics
     include AuthorEngine::Part::Input
 
+    attr_accessor :scale, :canvas, :canvas_context
     def initialize(code:)
       if RUBY_ENGINE == "opal"
         @scale  = 1.0

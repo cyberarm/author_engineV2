@@ -33,13 +33,24 @@ var projectString = `#{File.open(@project_file).read}`;
       }
     end
 
-    def opal_runtime
+    def game_runtime
       program = %{
 require "opal"
 require "opal-parser"
 require "author_engine/opal"
 
-AuthorEngine::GameRunner.new(`projectString`).show
+`var callback = function(){
+  \#{AuthorEngine::GameRunner.new(`projectString`).show}
+};
+
+if (
+    document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  callback();
+} else {
+  document.addEventListener("DOMContentLoaded", callback);
+}`
       }
 
       builder = Opal::Builder.new
@@ -75,7 +86,7 @@ AuthorEngine::GameRunner.new(`projectString`).show
     <script>
       #{project}
 
-      #{opal_runtime}
+      #{game_runtime}
     </script>
   </body>
 </html>
