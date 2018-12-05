@@ -45,7 +45,9 @@ class AuthorEngine
     def show(update_interval = 16.66667)
       return unless RUBY_ENGINE == "opal"
 
-      `window.addEventListener('resize', () => { #{resize_canvas} });`
+      `window.addEventListener('resize', () => { #{resize_canvas} })`
+      `document.addEventListener('keydown', (event) => { #{AuthorEngine::Part::Input::KEY_STATES[`event.key`] = true} })`
+      `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::Input::KEY_STATES[`event.key`] = false} })`
 
       `setInterval(function(){#{proc{draw; update}.call}}, #{update_interval})`
       return nil
