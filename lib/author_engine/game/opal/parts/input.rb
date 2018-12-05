@@ -6,8 +6,8 @@ class AuthorEngine
         "right" => "ArrowRight",
         "up"    => "ArrowUp",
         "down"  => "ArrowDown",
-        "x"     => "KeyX",
-        "y"     => "ArrowC",
+        "x"     => "x",
+        "y"     => "c",
       }
 
       # Store keys state
