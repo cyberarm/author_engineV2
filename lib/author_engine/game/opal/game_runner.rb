@@ -70,7 +70,7 @@ class AuthorEngine
       `#{@spritesheet}.src = #{temp_canvas}.toDataURL()`
     end
 
-    def show(update_interval = 16.66667)
+    def show(update_interval = (1000.0 / 60))
       return unless RUBY_ENGINE == "opal"
 
       `window.addEventListener('resize', () => { #{resize_canvas} })`
