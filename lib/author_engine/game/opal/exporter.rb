@@ -1,4 +1,5 @@
 require "opal"
+require "fileutils"
 
 class AuthorEngine
   class OpalExporter
@@ -15,6 +16,9 @@ class AuthorEngine
 
     def stylesheet
       %{
+@font-face { font-family: Connection; src: url('fonts/Connection.otf'); }
+@font-face { font-family: ConnectionBold; src: url('fonts/ConnectionBold.otf'); }
+
 body {
   margin: 0;
   padding: 0;
@@ -83,11 +87,7 @@ if (
       <h1>You're Browser Does Not Support HTML5 Canvas!</h1>
     </canvas>
 
-    <script>
-      #{project}
-
-      #{game_runtime}
-    </script>
+    <script src="application.js"></script>
   </body>
 </html>
       }
@@ -102,10 +102,32 @@ if (
       directory = File.expand_path(@project_file.sub(filename, ''))
       name      = filename.sub(".authorengine", "")
 
-      puts "Saving to \"#{directory}/#{name}.html\""
-      File.open("#{directory}/#{name}.html", "w") do |file|
+      export_path = "#{directory}/#{name}"
+      unless File.exists?(export_path)
+        Dir.mkdir(export_path)
+        unless File.exists?("#{export_path}/fonts")
+          Dir.mkdir("#{export_path}/fonts")
+        end
+      end
+
+      puts "Saving to \"#{export_path}\""
+      File.open("#{export_path}/#{name}.html", "w") do |file|
         file.write(string)
       end
+
+      File.open("#{export_path}/application.js", "w") do |file|
+        file.write(project)
+        file.write("\n\n\n")
+        file.write(game_runtime)
+      end
+
+      fonts_path = "#{File.expand_path("../../../../../", __FILE__)}/assets/fonts"
+      font_files = Dir.glob("#{fonts_path}/*")
+      font_files.each do |file|
+        FileUtils.cp(file, "#{export_path}/fonts/#{File.basename(file)}")
+      end
+
+      puts "Saved."
     end
   end
 end

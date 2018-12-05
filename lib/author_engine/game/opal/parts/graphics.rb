@@ -11,7 +11,7 @@ class AuthorEngine
       end
 
       def text(string, x = 0, y = 0, size = 4, z = 0, color = "white")
-        font = "#{size}px Consolas"
+        font = "#{size}px Connection, Consolas"
         `#{@canvas_context}.font = #{font}`
         `#{@canvas_context}.fillStyle = #{color}`
         `#{@canvas_context}.textBaseline = "top"`
