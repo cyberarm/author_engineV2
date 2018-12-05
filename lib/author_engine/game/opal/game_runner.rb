@@ -1,10 +1,21 @@
 class AuthorEngine
   class GameRunner
+    def self.instance
+      @instance
+    end
+    def self.instance=(klass)
+      @instance = klass
+    end
+
+    attr_reader :save_file, :spritesheet
     def initialize(project_string)
+      AuthorEngine::GameRunner.instance=(self)
+
       @save_file = AuthorEngine::SaveFile.new(nil)
       @save_file.load(false, project_string)
 
       @game = Game.new(code: @save_file.code)
+      build_spritesheet_and_sprites_list
       resize_canvas
 
       @game.init
@@ -39,7 +50,24 @@ class AuthorEngine
       `#{@game.canvas}.style.height = 128 * #{@game.scale}`
 
       `#{@game.canvas_context}.scale(#{@game.scale}, #{@game.scale})`
+      `#{@game.canvas_context}.imageSmoothingEnabled = false`
       return nil
+    end
+
+    def build_spritesheet_and_sprites_list
+      spritesheet_data = @save_file.sprites
+
+      temp_canvas = `document.createElement('canvas')`
+      temp_canvas_context = `#{temp_canvas}.getContext('2d')`
+      `#{temp_canvas}.width  = #{spritesheet_data.columns}`
+      `#{temp_canvas}.height = #{spritesheet_data.rows}`
+
+      buffer = `new Uint8ClampedArray(#{spritesheet_data.to_blob})`
+      image_data = `new ImageData(#{buffer}, #{spritesheet_data.columns})`
+      `#{temp_canvas_context}.putImageData(#{image_data}, 0, 0)`
+
+      @spritesheet = `new Image()`
+      `#{@spritesheet}.src = #{temp_canvas}.toDataURL()`
     end
 
     def show(update_interval = 16.66667)

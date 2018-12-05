@@ -8,6 +8,20 @@ class AuthorEngine
       end
 
       def sprite(sprite_sheet_index, x = 0, y = 0, z = 0, color = "white")
+        size = 16 # sprite size
+        sprites = AuthorEngine::GameRunner.instance.spritesheet
+        `#{@canvas_context}.drawImage(
+          #{sprites},
+          #{sprite_sheet_index * size},
+          0,
+          #{size},
+          #{size},
+
+          #{x},
+          #{y},
+          #{size},
+          #{size}
+          )`
       end
 
       def text(string, x = 0, y = 0, size = 4, z = 0, color = "white")
