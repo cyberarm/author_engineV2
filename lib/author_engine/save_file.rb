@@ -127,7 +127,12 @@ class AuthorEngine
         buffer += line.strip
       end
 
-      stream = buffer.scan(/../).map { |x| x.hex }.pack('c*')
+      stream = nil
+      if RUBY_ENGINE != "opal"
+        stream = buffer.scan(/../).map { |x| x.hex }.pack('c*')
+      else
+        stream = buffer.scan(/../).map { |x| Integer(x.hex) }
+      end
 
       @sprites = SpriteSheetData.new(width, height, stream)
     end
