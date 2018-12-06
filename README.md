@@ -8,7 +8,11 @@ A virtual console¹ that you code in Ruby.
 `gem install author_engine`
 
 ## Run
-`author_engine`
+`author_engine [filename]`
+- Run AuthorEngine editor with optional filename argument to open project`
+
+`author_engine export filename`
+- Export project to web using [Opal](https://opalrb.com).
 ### Options
 `--native` Open AuthorEngine in fullscreen and maximized.
 
