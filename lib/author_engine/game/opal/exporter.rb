@@ -28,6 +28,20 @@ body {
   display: block;
   margin: 0 auto;
 }
+#loading {
+  font-family: Connection, sans serif;
+  color: white;
+  text-align: center;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 50%;
+  height: 30%;
+  margin: auto;
+}
       }
     end
 
@@ -83,6 +97,7 @@ if (
     #{stylesheet}
   </style>
   <body>
+    <h1 id="loading">Loading...</h1>
     <canvas id="canvas">
       <h1>You're Browser Does Not Support HTML5 Canvas!</h1>
     </canvas>
