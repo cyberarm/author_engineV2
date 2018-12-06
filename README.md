@@ -8,7 +8,7 @@ A virtual console¹ that you code in Ruby.
 `gem install author_engine`
 
 ## Run
-`author_engine [filename]`
+`author_engine [filename] [options]`
 - Run AuthorEngine editor with optional filename argument to open project`
 
 `author_engine export filename`
