@@ -3,7 +3,7 @@ class AuthorEngine
     module Common
       def width; 128; end
       def height; 128; end
-      def fps; 0; end
+      def fps; AuthorEngine::GameRunner.instance.fps; end
       def milliseconds
         @__initial_milliseconds ||= `performance.now()`
         (`performance.now()` - @__initial_milliseconds).round(3)

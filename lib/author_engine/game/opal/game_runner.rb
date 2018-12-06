@@ -7,7 +7,7 @@ class AuthorEngine
       @instance = klass
     end
 
-    attr_reader :save_file, :spritesheet, :sprites
+    attr_reader :save_file, :spritesheet, :sprites, :fps
     def initialize(project_string)
       AuthorEngine::GameRunner.instance=(self)
 
@@ -19,6 +19,10 @@ class AuthorEngine
       @spritesheet_width  = @save_file.sprites.columns
       @spritesheet_height = @save_file.sprites.rows
       @sprite_size = 16
+
+      @fps = 0
+      @counted_frames = 0
+      @frame_count_stated_at = 0
 
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
@@ -42,6 +46,15 @@ class AuthorEngine
 
     def run_game
       `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
+
+      @counted_frames+=1
+
+      if @game.milliseconds - @frame_count_stated_at >= 1000.0
+        @fps = @counted_frames
+        @frame_count_stated_at = @game.milliseconds
+        @counted_frames = 0
+      end
+
 
       if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
         draw
