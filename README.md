@@ -9,7 +9,7 @@ A virtual console¹ that you code in Ruby.
 
 ## Run
 `author_engine [filename] [options]`
-- Run AuthorEngine editor with optional filename argument to open project`
+- Run AuthorEngine editor with optional filename argument to open project.
 
 `author_engine export filename`
 - Export project to web using [Opal](https://opalrb.com).
