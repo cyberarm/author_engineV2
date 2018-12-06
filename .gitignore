@@ -7,6 +7,6 @@
 /spec/reports/
 /tmp/
 
-_*.rb
-*.authorengine
-*.html
+**/_*.rb
+**/*.authorengine
+**/*.html
