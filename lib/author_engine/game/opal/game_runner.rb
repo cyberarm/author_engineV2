@@ -7,12 +7,18 @@ class AuthorEngine
       @instance = klass
     end
 
-    attr_reader :save_file, :spritesheet
+    attr_reader :save_file, :spritesheet, :sprites
     def initialize(project_string)
       AuthorEngine::GameRunner.instance=(self)
 
       @save_file = AuthorEngine::SaveFile.new(nil)
       @save_file.load(false, project_string)
+
+      @sprites = []
+      @spritesheet = nil
+      @spritesheet_width  = @save_file.sprites.columns
+      @spritesheet_height = @save_file.sprites.rows
+      @sprite_size = 16
 
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
@@ -31,6 +37,20 @@ class AuthorEngine
 
     def update
       @game.update
+      return nil
+    end
+
+    def run_game
+      `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
+
+      if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
+        draw
+        update
+      else
+        @game.draw_background
+        @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}.", 0, @game.height/2, 8)
+      end
+
       return nil
     end
 
@@ -56,6 +76,9 @@ class AuthorEngine
 
     def build_spritesheet_and_sprites_list
       spritesheet_data = @save_file.sprites
+      width = spritesheet_data.columns
+      height= spritesheet_data.rows
+      size  = 16
 
       temp_canvas = `document.createElement('canvas')`
       temp_canvas_context = `#{temp_canvas}.getContext('2d')`
@@ -63,11 +86,28 @@ class AuthorEngine
       `#{temp_canvas}.height = #{spritesheet_data.rows}`
 
       buffer = `new Uint8ClampedArray(#{spritesheet_data.to_blob})`
-      image_data = `new ImageData(#{buffer}, #{spritesheet_data.columns})`
+      image_data = `new ImageData(#{buffer}, #{width})`
       `#{temp_canvas_context}.putImageData(#{image_data}, 0, 0)`
 
       @spritesheet = `new Image()`
+      `#{@spritesheet}.onload = function() { #{load_sprites} }`
       `#{@spritesheet}.src = #{temp_canvas}.toDataURL()`
+
+    end
+
+    def load_sprites
+      spritesheet_data = @save_file.sprites
+      width = spritesheet_data.columns
+      height= spritesheet_data.rows
+      size  = 16
+
+      (height/size).times do |y|
+        (width/size).times do |x|
+          `createImageBitmap(#{@spritesheet}, #{x * size}, #{y * size}, #{size}, #{size}).then(sprite => { #{@sprites.push(`sprite`)} })`
+        end
+      end
+
+      return nil
     end
 
     def show(update_interval = (1000.0 / 60))
@@ -77,7 +117,8 @@ class AuthorEngine
       `document.addEventListener('keydown', (event) => { #{AuthorEngine::Part::Input::KEY_STATES[`event.key`] = true} })`
       `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::Input::KEY_STATES[`event.key`] = false} })`
 
-      `setInterval(function(){#{proc{draw; update}.call}}, #{update_interval})`
+      `document.getElementById('loading').style.display = "none"`
+      `window.requestAnimationFrame(function() {#{run_game}})`
       return nil
     end
   end

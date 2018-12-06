@@ -9,7 +9,7 @@ class AuthorEngine
 
       def sprite(sprite_sheet_index, x = 0, y = 0, z = 0, alpha = 255)
         size = 16 # sprite size
-        sprites = AuthorEngine::GameRunner.instance.spritesheet
+        sprites = AuthorEngine::GameRunner.instance.sprites
 
         `#{@canvas_context}.save()`
         if alpha <= 0
@@ -19,20 +19,9 @@ class AuthorEngine
         end
         `#{@canvas_context}.globalAlpha = #{alpha}`
 
-        `#{@canvas_context}.drawImage(
-          #{sprites},
-          #{sprite_sheet_index * size},
-          0,
-          #{size},
-          #{size},
+        `#{@canvas_context}.drawImage(#{sprites[sprite_sheet_index]}, #{x}, #{y})`
 
-          #{x},
-          #{y},
-          #{size},
-          #{size}
-          )`
-
-          `#{@canvas_context}.restore()`
+        `#{@canvas_context}.restore()`
       end
 
       def text(string, x = 0, y = 0, size = 4, z = 0, color = "white")
