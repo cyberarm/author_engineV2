@@ -26,6 +26,10 @@ class AuthorEngine
       @page = 0
     end
 
+    def y=(n)
+      @y = n
+    end
+
     def draw
       Gosu.draw_rect(@x-@offset, @y-@offset, @width+(@offset*2), @height+(@offset*2), Gosu::Color::WHITE, 15)
       Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color.rgba(10, 10, 10, 200), 15)
