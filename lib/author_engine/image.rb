@@ -12,6 +12,7 @@ class AuthorEngine
     def height; @image.height; end
 
     def image_from_cache(path)
+      path = "#{File.expand_path("../../../", __FILE__)}/#{path}"
       image = nil
       if image = CACHE.dig(path)
         return image
