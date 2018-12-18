@@ -4,7 +4,7 @@ class AuthorEngine
 
     attr_reader :active_sprite
     attr_reader :x, :y, :width, :height
-    attr_reader :rows, :columns
+    attr_reader :rows, :columns, :offset
     def initialize(x: nil, y:, width: nil, height: nil)
       @x, @y, @width, @height = x, y, width, height
       @sprite_size = window.sprite_size
@@ -21,7 +21,7 @@ class AuthorEngine
 
       @offset = 1 * window.square_scale
       @tooltip = AuthorEngine::Text.new(message: "", z: 100)
-      @current_page = AuthorEngine::Text.new(message: "Page 0", size: 20, x: window.width/2, y: @y - 24, z: 100)
+      @current_page = AuthorEngine::Text.new(message: "Page 0", size: 20, x: window.width/2, z: 100)
 
       @page = 0
     end
@@ -31,6 +31,8 @@ class AuthorEngine
     end
 
     def draw
+      @current_page.y = @y - 24
+
       Gosu.draw_rect(@x-@offset, @y-@offset, @width+(@offset*2), @height+(@offset*2), Gosu::Color::WHITE, 15)
       Gosu.draw_rect(@x, @y, @width, @height, Gosu::Color.rgba(10, 10, 10, 200), 15)
       draw_grid
