@@ -40,6 +40,7 @@ class AuthorEngine
 
       draw_and_update_tooltip
       @current_page.message = "Page #{@page}"
+      @current_page.x = @width/2 - @current_page.width/2
       @current_page.draw
     end
 
