@@ -11,7 +11,7 @@ class AuthorEngine
 
       @show_sprite_picker = true
       @show_level_picker  = true
-      @levels = Array.new(32) { [] }
+      @levels = [ [] ]
 
       @viewport_x, @viewport_y = 0, 0
 
@@ -37,12 +37,14 @@ class AuthorEngine
 
         Gosu.translate(@viewport_x, @viewport_y) do
           Gosu.scale(@scale, @scale, @editor_x, @editor_y) do
-            @levels[@level_picker.active_level].each do |s|
-              SpriteEditor.instance.sprites[s.sprite].draw(
-                ((s.x) * @sprite_size) + @editor_x,
-                ((s.y) * @sprite_size) + @editor_y,
-                0
-              )
+            if @levels[@level_picker.active_level]
+              @levels[@level_picker.active_level].each do |s|
+                SpriteEditor.instance.sprites[s.sprite].draw(
+                  ((s.x) * @sprite_size) + @editor_x,
+                  ((s.y) * @sprite_size) + @editor_y,
+                  0
+                )
+              end
             end
 
             SpriteEditor.instance.sprites[@sprites_picker.active_sprite].draw(
