@@ -20,18 +20,27 @@ class AuthorEngine
       end
 
       def sprite(index, x = 0, y = 0, z = 0, alpha = 255)
-        image = SpriteEditor.instance.sprites[index]
+        image = @sprites[index]
         raise "No sprite at '#{index}'!" unless image
         image.draw(x, y, z, 1,1, Gosu::Color.rgba(255,255,255, alpha))
       end
 
       def level(index, z = 0)
-        _level = LevelEditor.instance.levels[index]
+        _level = @levels[index]
         raise "No level at '#{index}'!" unless _level
 
-        _level.sort_by {|s| s.z }.each do |sprite|
+        _level.each do |sprite|
           sprite(sprite.sprite, sprite.x * Window.instance.sprite_size, sprite.y * Window.instance.sprite_size, z)
         end
+      end
+
+      def swap(level, current_sprite, replacement_sprite)
+        _level = @levels[level]
+        raise "No level at '#{index}'!" unless _level
+        raise "No sprite at '#{current_sprite}'!" unless @sprites[current_sprite]
+        raise "No sprite at '#{current_sprite}'!" unless @sprites[replacement_sprite]
+
+        _level.each {|sprite| sprite.sprite = replacement_sprite if sprite.sprite == current_sprite}
       end
 
       def translate(x, y, &block)
