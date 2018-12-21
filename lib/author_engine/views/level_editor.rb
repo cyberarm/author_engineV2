@@ -1,6 +1,5 @@
 class AuthorEngine
   class LevelEditor < View
-    Sprite = Struct.new(:sprite, :x, :y, :z)
 
     attr_reader :levels
     def setup
@@ -12,7 +11,12 @@ class AuthorEngine
       @show_sprite_picker = true
       @show_level_picker  = true
       @show_coordinates   = true
-      @levels = [ [] ]
+
+      if window.container.savefile.levels.size > 0
+        @levels = window.container.savefile.levels
+      else
+        @levels = [ [] ]
+      end
 
       @viewport_x, @viewport_y = 0, 0
 

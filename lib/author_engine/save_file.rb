@@ -64,7 +64,10 @@ class AuthorEngine
 
     def save_levels
       @buffer+= "___LEVELS___\n"
-      # @buffer+= LevelEditor.instance.levels
+      LevelEditor.instance.levels.each do |level|
+        p level
+        @buffer+= "#{level.map {|s| "#{s.sprite},#{s.x},#{s.y},#{s.z}"}.join(",")}\n"
+      end
       @buffer+="\n"
     end
 
@@ -138,6 +141,29 @@ class AuthorEngine
     end
 
     def load_levels(string)
+      levels   = []
+      in_level = false
+
+      string.each_line do |line|
+        if line.start_with?("___LEVELS___")
+          in_level = true
+          next
+        end
+        if line.start_with?("___") && in_level
+          break
+        end
+
+        if in_level
+          level = []
+          # 0 - Sprite, 1 - X, 2 - Y, 3 - Z
+          line.strip.split(",").each_slice(4) do |sprite|
+            level << Sprite.new(Integer(sprite[0]), Integer(sprite[1]), Integer(sprite[2]), Integer(sprite[3]))
+          end
+          levels << level
+        end
+      end
+
+      @levels = levels
     end
   end
 end

@@ -1,4 +1,3 @@
 class AuthorEngine
-  class Sprite
-  end
+  Sprite = Struct.new(:sprite, :x, :y, :z)
 end
