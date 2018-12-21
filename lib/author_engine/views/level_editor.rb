@@ -11,6 +11,7 @@ class AuthorEngine
 
       @show_sprite_picker = true
       @show_level_picker  = true
+      @show_coordinates   = true
       @levels = [ [] ]
 
       @viewport_x, @viewport_y = 0, 0
@@ -19,6 +20,7 @@ class AuthorEngine
       @editor_x, @editor_y = self.width / 2 - ((AuthorEngine::Window::VIEW_HEIGHT * @scale) / 2), self.y
 
       @sprite_size =  window.sprite_size
+      @coordinates = AuthorEngine::Text.new(z: 18)
     end
 
     def focus
@@ -56,6 +58,8 @@ class AuthorEngine
           end
         end
       end
+
+      @coordinates.draw if @show_coordinates
     end
 
     def update
@@ -83,7 +87,13 @@ class AuthorEngine
 
       if mouse_inside_view?
         if (!@show_sprite_picker && !@show_level_picker)
+          @show_coordinates = true
+          @coordinates.message = "x: #{normalize((window.mouse_x - @viewport_x) - @editor_x)}, y: #{normalize((window.mouse_y - @viewport_y) - @editor_y)}"
+          @coordinates.x = window.mouse_x
+          @coordinates.y = window.mouse_y - window.square_scale*16
           move_viewport
+        else
+          @show_coordinates = false
         end
       end
 
@@ -117,9 +127,6 @@ class AuthorEngine
 
     def normalize(int)
       i = (int.to_f / (@sprite_size * @scale)).floor
-      if i < 0
-        i = 0
-      end
 
       return i
     end
