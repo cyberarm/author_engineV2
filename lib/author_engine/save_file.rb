@@ -67,7 +67,7 @@ class AuthorEngine
       LevelEditor.instance.levels.each do |level|
         @buffer+= "#{level.map {|s| "#{s.sprite},#{s.x},#{s.y},#{s.z}"}.join(",")}\n"
       end
-      @buffer+="\n"
+      @buffer.strip # Level is the last element saved
     end
 
     def load(from_file = true, data = nil)
