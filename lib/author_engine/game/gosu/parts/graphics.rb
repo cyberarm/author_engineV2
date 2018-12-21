@@ -25,6 +25,15 @@ class AuthorEngine
         image.draw(x, y, z, 1,1, Gosu::Color.rgba(255,255,255, alpha))
       end
 
+      def level(index, z = 0)
+        _level = LevelEditor.instance.levels[index]
+        raise "No level at '#{index}'!" unless _level
+
+        _level.sort_by {|s| s.z }.each do |sprite|
+          sprite(sprite.sprite, sprite.x * Window.instance.sprite_size, sprite.y * Window.instance.sprite_size, z)
+        end
+      end
+
       def translate(x, y, &block)
         Gosu.translate(x, y) do
           block.call if block

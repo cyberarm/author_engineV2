@@ -65,7 +65,6 @@ class AuthorEngine
     def save_levels
       @buffer+= "___LEVELS___\n"
       LevelEditor.instance.levels.each do |level|
-        p level
         @buffer+= "#{level.map {|s| "#{s.sprite},#{s.x},#{s.y},#{s.z}"}.join(",")}\n"
       end
       @buffer+="\n"
