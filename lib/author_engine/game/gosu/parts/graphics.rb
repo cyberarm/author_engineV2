@@ -30,7 +30,7 @@ class AuthorEngine
         raise "No level at '#{index}'!" unless _level
 
         _level.each do |sprite|
-          sprite(sprite.sprite, sprite.x * Window.instance.sprite_size, sprite.y * Window.instance.sprite_size, z)
+          sprite(sprite.sprite, sprite.x, sprite.y, z)
         end
       end
 
