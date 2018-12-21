@@ -42,6 +42,10 @@ end
 ### rect(x = 0, y = 0, width = 1, height = 1, color = white, z = 0)
 ### sprite(sprite_sheet_index, x = 0, y = 0, z = 0, color = white)
 ### text(string, x = 0, y = 0, size = 4, z = 0, color = white)
+### level(level_index, z = 0)
+
+### swap(level_index, current_sprite, replacement_sprite)
+  Swap level's current_sprite with replacement_sprite
 
 ### translate(x, y, &block)
   Translate the contents of block by x and y
