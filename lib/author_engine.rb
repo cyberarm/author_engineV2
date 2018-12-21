@@ -19,6 +19,8 @@ require_relative "author_engine/palette"
 require_relative "author_engine/image"
 require_relative "author_engine/save_file"
 
+
+require_relative "author_engine/collision_detection/collision_detection"
 require_relative "author_engine/game/game"
 
 require_relative "author_engine/code_editor/cursor"
