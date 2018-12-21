@@ -1,6 +1,6 @@
 class AuthorEngine
   class LevelEditor < View
-    Sprite = Struct.new(:sprite, :x, :y)
+    Sprite = Struct.new(:sprite, :x, :y, :z)
 
     attr_reader :levels
     def setup
@@ -42,7 +42,7 @@ class AuthorEngine
                 SpriteEditor.instance.sprites[s.sprite].draw(
                   ((s.x) * @sprite_size) + @editor_x,
                   ((s.y) * @sprite_size) + @editor_y,
-                  0
+                  s.z
                 )
               end
             end
@@ -95,9 +95,9 @@ class AuthorEngine
 
       case button
       when Gosu::MsLeft
-        place(normalize((window.mouse_x - @viewport_x) - @editor_x), normalize((window.mouse_y - @viewport_y) - @editor_y), :add)
+        place(normalize((window.mouse_x - @viewport_x) - @editor_x), normalize((window.mouse_y - @viewport_y) - @editor_y), @level_picker.active_layer, :add)
       when Gosu::MsRight
-        place(normalize((window.mouse_x - @viewport_x) - @editor_x), normalize((window.mouse_y - @viewport_y) - @editor_y), :remove)
+        place(normalize((window.mouse_x - @viewport_x) - @editor_x), normalize((window.mouse_y - @viewport_y) - @editor_y), @level_picker.active_layer, :remove)
       end
     end
 
@@ -124,14 +124,14 @@ class AuthorEngine
       return i
     end
 
-    def place(x, y, mode)
+    def place(x, y, z, mode)
       sprite = @levels[@level_picker.active_level].detect do |s|
-        s.x == x && s.y == y
+        s.x == x && s.y == y && s.z == z
       end
 
       case mode
       when :add
-        new_sprite = Sprite.new(@sprites_picker.active_sprite, x, y)
+        new_sprite = Sprite.new(@sprites_picker.active_sprite, x, y, z)
         if sprite
           @levels[@level_picker.active_level][@levels[@level_picker.active_level].index(sprite)] = new_sprite
         else

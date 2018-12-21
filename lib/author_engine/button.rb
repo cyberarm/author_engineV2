@@ -111,7 +111,7 @@ class AuthorEngine
         @image.draw(@x+@x_padding, @y+@y_padding, @z, (1 * window.square_scale), (1 * window.square_scale))
 
       else
-        raise "Nothing to draw! (text and image were nil or invalid types)"
+        raise "Nothing to draw! (label and image were nil or invalid types)"
       end
     end
 
