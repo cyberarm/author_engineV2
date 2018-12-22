@@ -91,34 +91,7 @@ class AuthorEngine
       end
     end
 
-    # private
-    def bounding_boxes_intersect?(a, a_x, a_y,  b, b_x, b_y)
-      (a.x + a_x) <= (b.x + b_x + b.width)  && (a.x + a_x + a.width)  >= (b.x + b_x) &&
-      (a.y + a_y) <= (b.y + b_y + b.height) && (a.y + a_y + a.height) >= (b.y + b_y)
-    end
-
-    def draw_line(x, y, x2, y2, color, z = 0)
-      if RUBY_ENGINE == "opal"
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.strokeStyle = #{color}`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineWidth = 1`
-
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.beginPath()`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.moveTo(#{x}, #{y})`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineTo(#{x2}, #{y2})`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.stroke()`
-      else
-        Gosu.draw_line(x, y, color, x2, y2, color, z)
-      end
-    end
-
-    # returns alpha value of pixel at x and y
-    def solid_at?(blob, x, y)
-      width = 16
-
-      blob[(y * width + x) * 4 + 3].ord
-    end
-
-    def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff0000)
+    def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff00ff)
       if RUBY_ENGINE == "opal"
         color = "green"
         collision_color = "red"
@@ -159,6 +132,33 @@ class AuthorEngine
         box.x + sprite_x, box.y + sprite_y,
         paint_color, z
       )
+    end
+
+    private
+    def bounding_boxes_intersect?(a, a_x, a_y,  b, b_x, b_y)
+      (a.x + a_x) <= (b.x + b_x + b.width)  && (a.x + a_x + a.width)  >= (b.x + b_x) &&
+      (a.y + a_y) <= (b.y + b_y + b.height) && (a.y + a_y + a.height) >= (b.y + b_y)
+    end
+
+    def draw_line(x, y, x2, y2, color, z = 0)
+      if RUBY_ENGINE == "opal"
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.strokeStyle = #{color}`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineWidth = 1`
+
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.beginPath()`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.moveTo(#{x}, #{y})`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineTo(#{x2}, #{y2})`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.stroke()`
+      else
+        Gosu.draw_line(x, y, color, x2, y2, color, z)
+      end
+    end
+
+    # returns alpha value of pixel at x and y
+    def solid_at?(blob, x, y)
+      width = 16
+
+      blob[(y * width + x) * 4 + 3].ord
     end
 
     def bounding_box(blob, size = 16)
