@@ -26,7 +26,7 @@ class AuthorEngine
       end
 
       def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff00ff)
-        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff00ff)
+        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges, z, color, collision_color)
       end
     end
   end
