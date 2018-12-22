@@ -99,10 +99,18 @@ if (
   <body>
     <h1 id="loading">Loading...</h1>
     <canvas id="canvas">
-      <h1>You're Browser Does Not Support HTML5 Canvas!</h1>
+      <h1>Your Browser Does Not Support HTML5 Canvas!</h1>
     </canvas>
 
-    <script src="application.js"></script>
+    <script>
+      // Add a small delay before loading application in order to finish loading page and show "Loading..."
+      window.setTimeout(function() {
+        var script = document.createElement('script');
+        script.src = "application.js";
+
+        document.head.appendChild(script);
+      }, 500);
+    </script>
   </body>
 </html>
       }

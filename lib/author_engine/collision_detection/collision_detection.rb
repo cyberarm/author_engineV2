@@ -19,10 +19,11 @@ class AuthorEngine
 
     def add_sprite(image_or_blob)
       blob = nil
-      if defined?(Gosu::Image) && image_or_blob.is_a?(Gosu::Image)
+      if RUBY_ENGINE != "opal"
         blob = image_or_blob.to_blob
       else
-        blob = image_or_blob
+        blob = []
+        `#{image_or_blob}.forEach(function(value) {#{blob << `value`}})`#.each {|n| blob << n}
       end
 
       @sprites << {blob: blob, box: bounding_box(blob)}
@@ -98,8 +99,13 @@ class AuthorEngine
 
     def draw_line(x, y, x2, y2, color, z = 0)
       if RUBY_ENGINE == "opal"
-        # TODO
-        puts "FIXME: CollisionDetection#draw_line"
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.strokeStyle = #{color}`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineWidth = 1`
+
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.beginPath()`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.moveTo(#{x}, #{y})`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineTo(#{x2}, #{y2})`
+        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.stroke()`
       else
         Gosu.draw_line(x, y, color, x2, y2, color, z)
       end
@@ -113,6 +119,10 @@ class AuthorEngine
     end
 
     def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff0000)
+      if RUBY_ENGINE == "opal"
+        color = "green"
+        collision_color = "red"
+      end
       paint_color = color
       # EDGE: TOP
       # TOP LEFT TO TOP RIGHT

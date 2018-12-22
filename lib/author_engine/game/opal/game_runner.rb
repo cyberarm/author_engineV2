@@ -7,12 +7,18 @@ class AuthorEngine
       @instance = klass
     end
 
-    attr_reader :save_file, :spritesheet, :sprites, :fps
+    attr_reader :save_file, :spritesheet, :sprites, :levels, :fps
+    attr_reader :game
     def initialize(project_string)
       AuthorEngine::GameRunner.instance=(self)
 
       @save_file = AuthorEngine::SaveFile.new(nil)
       @save_file.load(false, project_string)
+
+      size = 16
+
+      @levels  = @save_file.levels
+      @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
 
       @sprites = []
       @spritesheet = nil
@@ -27,6 +33,11 @@ class AuthorEngine
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
       resize_canvas
+
+      @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels)
+      @game.collision_detection = @collision_detection
+
+      @levels.each {|level| @collision_detection.add_level(level) }
 
       @game.init
 
@@ -114,8 +125,17 @@ class AuthorEngine
       height= spritesheet_data.rows
       size  = 16
 
+      temp_canvas = `document.createElement('canvas')`
+      temp_canvas_context = `#{temp_canvas}.getContext('2d')`
+      `#{temp_canvas}.width  = #{size}`
+      `#{temp_canvas}.height = #{size}`
+
       (height/size).times do |y|
         (width/size).times do |x|
+          `#{temp_canvas_context}.clearRect(0,0, #{size}, #{size})`
+          `#{temp_canvas_context}.drawImage(#{@spritesheet}, #{x * size}, #{y * size}, #{size}, #{size}, 0, 0, #{size}, #{size})`
+          @collision_detection.add_sprite(`#{temp_canvas_context}.getImageData(0,0, #{size}, #{size}).data`)
+
           `createImageBitmap(#{@spritesheet}, #{x * size}, #{y * size}, #{size}, #{size}).then(sprite => { #{@sprites.push(`sprite`)} })`
         end
       end

@@ -5,6 +5,7 @@ require_relative "game/opal/parts/colors"
 require_relative "game/opal/parts/graphics"
 require_relative "game/opal/parts/input"
 
+require_relative "collision_detection/collision_detection"
 require_relative "sprite"
 
 require_relative "game/game"

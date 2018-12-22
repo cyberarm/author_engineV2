@@ -32,6 +32,24 @@ class AuthorEngine
         `#{@canvas_context}.fillText(#{string}, #{x}, #{y})`
       end
 
+      def level(index, z = 0)
+        _level = AuthorEngine::GameRunner.instance.levels[index]
+        raise "No level at '#{index}'!" unless _level
+
+        _level.each do |sprite|
+          sprite(sprite.sprite, sprite.x, sprite.y, z)
+        end
+      end
+
+      def swap(level, current_sprite, replacement_sprite)
+        _level = AuthorEngine::GameRunner.instance.levels[level]
+        raise "No level at '#{index}'!" unless _level
+        raise "No sprite at '#{current_sprite}'!" unless AuthorEngine::GameRunner.instance.sprites[current_sprite]
+        raise "No sprite at '#{current_sprite}'!" unless AuthorEngine::GameRunner.instance.sprites[replacement_sprite]
+
+        _level.each {|sprite| sprite.sprite = replacement_sprite if sprite.sprite == current_sprite}
+      end
+
       def translate(x, y, &block)
         `#{@canvas_context}.save()`
         `#{@canvas_context}.translate(#{x}, #{y})`

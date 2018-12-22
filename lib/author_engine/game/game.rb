@@ -6,7 +6,7 @@ class AuthorEngine
     include AuthorEngine::Part::Input
 
     attr_accessor :scale, :canvas, :canvas_context
-    attr_reader :collision_detection
+    attr_accessor :collision_detection
     def initialize(code:)
       if RUBY_ENGINE == "opal"
         @scale  = 1.0
@@ -14,24 +14,22 @@ class AuthorEngine
         @canvas_context = `#{@canvas}.getContext('2d')`
       end
 
+      if RUBY_ENGINE != "opal"
+        @sprites = SpriteEditor.instance.sprites
 
-      @sprites = SpriteEditor.instance.sprites
+        @levels = []
+        # Create a "Deep Copy" to allow for swapping of a level's sprites without corrupting LevelEditor's version
+        LevelEditor.instance.levels.each do |level|
+          @levels << level.sort_by {|sprite| sprite.z}.map {|sprite| sprite.dup}
+        end
+        size = 16
+        @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
 
-      @levels = []
-      # Create a "Deep Copy" to allow for swapping of a level's sprites without corrupting LevelEditor's version
-      LevelEditor.instance.levels.each do |level|
-        @levels << level.sort_by {|sprite| sprite.z}.map {|sprite| sprite.dup}
+        @collision_detection = CollisionDetection.new(@sprites, @levels)
+
+        @sprites.each {|sprite| @collision_detection.add_sprite(sprite) }
+        @levels.each {|level| @collision_detection.add_level(level) }
       end
-      size = 16
-      @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
-
-      @collision_detection = CollisionDetection.new(@sprites, @levels)
-
-      @sprites.each do |sprite|
-        @collision_detection.add_sprite(sprite.to_blob) if RUBY_ENGINE == "opal"
-        @collision_detection.add_sprite(sprite) if RUBY_ENGINE != "opal"
-      end
-      @levels.each {|level| @collision_detection.add_level(level) }
 
       @background_color = black
       self.instance_eval(code)
