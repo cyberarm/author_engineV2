@@ -38,6 +38,22 @@ end
 ### milliseconds
   Milliseconds since game started
 
+# CollisionDetection
+### bounding_box(sprite_index)
+  returns the bounding_box for sprite
+### sprite_vs_sprite(sprite_index, sprite_x, sprite_y, target_sprite_index, target_x, target_y)
+  determine whether 2 sprites are colliding
+### sprite_vs_level(sprite_index, sprite_x, sprite_y, level)
+  returns an array of level tiles that sprite is colliding with. returns an empty array if non are colliding.
+### colliding_edge(sprite_index, sprite_x, sprite_y, target_sprite_index, target_x, target_y)
+  determine the edge of which sprite is colliding with with target
+### draw_sprite_box(sprite_index, sprite_x, sprite_y)
+  draws sprites bounding box
+### draw_level_boxes(level_index)
+  draws bounding boxes around each tile of level
+### render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY)
+  draw bounding box around sprite with optional edges from colliding_edges to show colliding edges
+
 # Graphics
 ### rect(x = 0, y = 0, width = 1, height = 1, color = white, z = 0)
 ### sprite(sprite_sheet_index, x = 0, y = 0, z = 0, color = white)

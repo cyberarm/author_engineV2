@@ -25,8 +25,8 @@ class AuthorEngine
         @collision_detection.debug_draw_level(level_index)
       end
 
-      def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff00ff)
-        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges, z, color, collision_color)
+      def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY)
+        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges, z, nil, nil)
       end
     end
   end
