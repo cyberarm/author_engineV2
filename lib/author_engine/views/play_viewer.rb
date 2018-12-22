@@ -110,6 +110,7 @@ class AuthorEngine
       # super
       if @running
         catch_error do
+          @game.collision_detection.clear
           update_game
         end
       else

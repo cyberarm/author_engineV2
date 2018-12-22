@@ -6,7 +6,7 @@ class AuthorEngine
     include AuthorEngine::Part::Input
 
     attr_accessor :scale, :canvas, :canvas_context
-
+    attr_reader :collision_detection
     def initialize(code:)
       if RUBY_ENGINE == "opal"
         @scale  = 1.0
