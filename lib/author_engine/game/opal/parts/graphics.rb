@@ -1,6 +1,6 @@
 class AuthorEngine
   class Part
-    module Graphics
+    module OpalGraphics
       def rect(x = 0, y = 0, width = 1, height = 1, color = "white", z = 0)
         `#{@canvas_context}.fillStyle = #{color}`
         `#{@canvas_context}.fillRect(#{x}, #{y}, #{width}, #{height})`

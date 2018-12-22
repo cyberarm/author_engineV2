@@ -1,6 +1,6 @@
 class AuthorEngine
   class Part
-    module Input
+    module GosuInput
       BUTTONS = {
         "left" => Gosu::KbLeft,
         "right" => Gosu::KbRight,

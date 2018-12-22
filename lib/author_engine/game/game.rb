@@ -3,8 +3,14 @@ class AuthorEngine
     include AuthorEngine::Part::Common
     include AuthorEngine::Part::CollisionDetection
     include AuthorEngine::Part::Colors
-    include AuthorEngine::Part::Graphics
-    include AuthorEngine::Part::Input
+
+    if RUBY_ENGINE == "opal"
+      include AuthorEngine::Part::OpalGraphics
+      include AuthorEngine::Part::OpalInput
+    else
+      include AuthorEngine::Part::GosuGraphics
+      include AuthorEngine::Part::GosuInput
+    end
 
     attr_accessor :scale, :canvas, :canvas_context
     attr_accessor :collision_detection

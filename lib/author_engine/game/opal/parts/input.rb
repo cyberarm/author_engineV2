@@ -1,6 +1,6 @@
 class AuthorEngine
   class Part
-    module Input
+    module OpalInput
       BUTTONS = {
         "left"  => "ArrowLeft",
         "right" => "ArrowRight",
