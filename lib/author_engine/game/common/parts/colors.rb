@@ -45,7 +45,11 @@ class AuthorEngine
       def peach;       rgb(COLORS.dig(15)); end
 
       def rgb(color)
-        return "rgb(#{color.red}, #{color.green}, #{color.blue})"
+        if RUBY_ENGINE == "opal"
+          return "rgb(#{color.red}, #{color.green}, #{color.blue})"
+        else
+          return Gosu::Color.rgb(color.red, color.green, color.blue)
+        end
       end
 
       def xml_color(color)
