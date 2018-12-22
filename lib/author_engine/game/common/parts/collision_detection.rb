@@ -26,7 +26,7 @@ class AuthorEngine
       end
 
       def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY)
-        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges, z, nil, nil)
+        @collision_detection.render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges, z)
       end
     end
   end
