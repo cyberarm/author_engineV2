@@ -10,7 +10,7 @@ class AuthorEngine
         "y"     => "c",
       }
 
-      # Store keys state
+      # Store key states
       KEY_STATES = {
       }
 

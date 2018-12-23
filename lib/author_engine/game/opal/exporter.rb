@@ -42,7 +42,7 @@ body {
 #canvas {
   display: block;
   margin: 0 auto;
-  cursor: none;
+  // cursor: none;
 }
 #loading {
   font-family: Connection, sans serif;

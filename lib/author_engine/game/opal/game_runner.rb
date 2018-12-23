@@ -7,6 +7,8 @@ class AuthorEngine
       @instance = klass
     end
 
+    include TouchHandler
+
     attr_reader :save_file, :spritesheet, :sprites, :levels, :fps
     attr_reader :game
     def initialize(project_string)
@@ -29,6 +31,9 @@ class AuthorEngine
       @fps = 0
       @counted_frames = 0
       @frame_count_stated_at = 0
+
+      @show_touch_controls = false
+      touch_handler_setup
 
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
@@ -70,7 +75,6 @@ class AuthorEngine
 
       if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
         width = 128 * @game.scale
-        puts @game.scale
 
         # `#{@canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
         `#{@game.canvas_context}.save()`
@@ -81,14 +85,19 @@ class AuthorEngine
         region = `new Path2D()`
         `#{region}.rect(0, 0, 128, 128)`
         `#{@game.canvas_context}.clip(#{region})`
+        `#{@game.canvas_context}.save()`
         draw
 
         `#{@game.canvas_context}.restore()`
         `#{@game.canvas_context}.restore()`
+        `#{@game.canvas_context}.restore()`
 
-        draw_touch_controls
         update
-        update_touch_controls
+
+        if @show_touch_controls
+          draw_touch_controls
+          update_touch_controls
+        end
       else
         @game.draw_background
         @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}.", 0, @game.height/2, 8)
@@ -98,6 +107,17 @@ class AuthorEngine
     end
 
     def draw_touch_controls
+      game_width = 128 * @game.scale
+      game_x     = `window.innerWidth/2 - #{game_width/2}`
+      `#{@game.canvas_context}.fillStyle = #{@game.dark_gray}`
+      `#{@game.canvas_context}.fillRect(#{game_x}-250, window.innerHeight/2 - 50, 150, 150)`
+      `#{@game.canvas_context}.fillStyle = #{@game.black}`
+      `#{@game.canvas_context}.fillRect(#{game_x}-200, window.innerHeight/2, 50, 50)`
+
+      `#{@game.canvas_context}.fillStyle = #{@game.red}`
+      `#{@game.canvas_context}.fillRect(#{game_x+game_width}+50, window.innerHeight/2, 50, 50)`
+      `#{@game.canvas_context}.fillStyle = #{@game.yellow}`
+      `#{@game.canvas_context}.fillRect(#{game_x+game_width}+150, window.innerHeight/2, 50, 50)`
     end
 
     def update_touch_controls
@@ -113,10 +133,10 @@ class AuthorEngine
         @game.scale = `window.innerHeight / 128.0`
       end
 
-      `#{@game.canvas}.width  = #{width}`#128 * #{@game.scale}`
-      `#{@game.canvas}.height = #{height}`#128 * #{@game.scale}`
-      `#{@game.canvas}.style.width  = #{width}`#128 * #{@game.scale}`
-      `#{@game.canvas}.style.height = #{height}`#128 * #{@game.scale}`
+      `#{@game.canvas}.width  = #{width}`
+      `#{@game.canvas}.height = #{height}`
+      `#{@game.canvas}.style.width  = #{width}`
+      `#{@game.canvas}.style.height = #{height}`
 
       `#{@game.canvas_context}.imageSmoothingEnabled = false`
       return nil
@@ -173,6 +193,11 @@ class AuthorEngine
       `window.addEventListener('resize', () => { #{resize_canvas} })`
       `document.addEventListener('keydown', (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = true} })`
       `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = false} })`
+
+      `#{@game.canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`); puts "Touch started..."} })`
+      `#{@game.canvas}.addEventListener('touchmove',   (event) => { #{handle_touch_move(`event`); puts "Touch moved..."} })`
+      `#{@game.canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`); puts "Touch canceled."} })`
+      `#{@game.canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`); puts "Touch Ended."} })`
 
       `document.getElementById('loading').style.display = "none"`
       `window.requestAnimationFrame(function() {#{run_game}})`
