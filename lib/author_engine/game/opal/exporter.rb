@@ -14,6 +14,21 @@ class AuthorEngine
       return name.split("_").map {|n| n.capitalize}.join(" ")
     end
 
+    # Rebuild opal runtime of it doesn't exist or if its out of date
+    def build_opal?
+      opal_runtime = "#{export_directory}/js/runtime.js"
+
+      if File.exists?(opal_runtime)
+        file = File.open(opal_runtime)
+        version = file.first.gsub("/", "").strip
+        file.close
+
+        Opal::VERSION != version
+      else
+        true
+      end
+    end
+
     def stylesheet
       %{
 @font-face { font-family: Connection; src: url('fonts/Connection.otf'); }
@@ -54,8 +69,8 @@ var projectString = `#{File.open(@project_file).read}`;
 
     def game_runtime
       program = %{
-require "opal"
-require "opal-parser"
+# require "opal"
+# require "opal-parser"
 require "author_engine/opal"
 
 `var callback = function(){
@@ -72,18 +87,34 @@ if (
 }`
       }
 
-      builder = Opal::Builder.new
-      base_path = File.expand_path("../../../..", __FILE__)
-      builder.append_paths("#{base_path}")
-
       puts "Transpiling to JavaScript using Opal..."
 
+      opal_builder = nil
+      if build_opal?
+        puts "  Building Opal runtime..."
 
-      builder.build("opal")
-      builder.build("opal-parser")
-      builder.build_require("author_engine/opal")
+        opal_builder = Opal::Builder.new
+        opal_builder.build("opal")
+        opal_builder.build("opal-parser")
+      else
+        puts "  Skipping Opal runtime. Already exists as v#{Opal::VERSION}..."
+      end
 
-      builder.build_str(program, "(inline)").to_s
+      puts "  Building AuthorEngine runtime with project..."
+      game_builder = Opal::Builder.new
+      base_path = File.expand_path("../../../..", __FILE__)
+      game_builder.append_paths("#{base_path}")
+
+      game_builder.build_require("author_engine/opal")
+
+      opal_builder_js  = nil
+      if opal_builder
+        opal_runtime_js = opal_builder.build_str("", "(inline)").to_s
+      end
+
+      author_engine_js = game_builder.build_str(program, "(inline)").to_s
+
+      return {opal_runtime: opal_runtime_js, author_engine_runtime: author_engine_js}
     end
 
     def template
@@ -103,13 +134,23 @@ if (
       <h1>Your Browser Does Not Support HTML5 Canvas!</h1>
     </canvas>
 
+    <script src="game.js"></script>
     <script>
       // Add a small delay before loading application in order to finish loading page and show "Loading..."
       window.setTimeout(function() {
-        var script = document.createElement('script');
-        script.src = "application.js";
+        console.log("Loading Opal runtime...");
 
-        document.head.appendChild(script);
+        var opal_runtime = document.createElement('script');
+        opal_runtime.onload = function() {
+          console.log("Loading AuthorEngine runtime...");
+
+          var author_engine_runtime = document.createElement('script');
+          author_engine_runtime.src = "js/author_engine.js";
+          document.head.appendChild(author_engine_runtime);
+        }
+        opal_runtime.src = "js/runtime.js";
+
+        document.head.appendChild(opal_runtime);
       }, 500);
     </script>
   </body>
@@ -121,17 +162,28 @@ if (
       template
     end
 
-    def save(string)
+    def export_directory
       filename  = File.basename(@project_file)
       directory = File.expand_path(@project_file.sub(filename, ''))
       name      = filename.sub(".authorengine", "")
 
+      return "#{directory}/#{name}"
+    end
+
+    def save(string)
+      filename  = File.basename(@project_file)
+      directory = File.expand_path(@project_file.sub(filename, ''))
+      name      = filename.sub(".authorengine", "")
       export_path = "#{directory}/#{name}"
+
       unless File.exists?(export_path)
         Dir.mkdir(export_path)
-        unless File.exists?("#{export_path}/fonts")
-          Dir.mkdir("#{export_path}/fonts")
-        end
+      end
+      unless File.exists?("#{export_path}/fonts")
+        Dir.mkdir("#{export_path}/fonts")
+      end
+      unless File.exists?("#{export_path}/js")
+        Dir.mkdir("#{export_path}/js")
       end
 
       puts "Saving to \"#{export_path}\""
@@ -139,10 +191,20 @@ if (
         file.write(string)
       end
 
-      File.open("#{export_path}/application.js", "w") do |file|
+      hash = game_runtime
+      if hash[:opal_runtime]
+        File.open("#{export_path}/js/runtime.js", "w") do |file|
+          file.write("// #{Opal::VERSION}\n")
+          file.write(hash[:opal_runtime])
+        end
+      end
+
+      File.open("#{export_path}/game.js", "w") do |file|
         file.write(project)
-        file.write("\n\n\n")
-        file.write(game_runtime)
+      end
+
+      File.open("#{export_path}/js/author_engine.js", "w") do |file|
+        file.write(hash[:author_engine_runtime])
       end
 
       fonts_path = "#{File.expand_path("../../../../../", __FILE__)}/assets/fonts"
