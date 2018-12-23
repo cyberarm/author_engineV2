@@ -57,6 +57,7 @@ class AuthorEngine
 
     def run_game
       `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
+      `#{@game.canvas_context}.clearRect(0,0, window.innerWidth, window.innerHeight)`
 
       @counted_frames+=1
 
@@ -68,14 +69,38 @@ class AuthorEngine
 
 
       if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
+        width = 128 * @game.scale
+        puts @game.scale
+
+        # `#{@canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
+        `#{@game.canvas_context}.save()`
+        `#{@game.canvas_context}.translate(window.innerWidth/2 - #{width/2}, 0)`
+        `#{@game.canvas_context}.scale(#{@game.scale}, #{@game.scale})`
+        `#{@game.canvas_context}.save()`
+
+        region = `new Path2D()`
+        `#{region}.rect(0, 0, 128, 128)`
+        `#{@game.canvas_context}.clip(#{region})`
         draw
+
+        `#{@game.canvas_context}.restore()`
+        `#{@game.canvas_context}.restore()`
+
+        draw_touch_controls
         update
+        update_touch_controls
       else
         @game.draw_background
         @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}.", 0, @game.height/2, 8)
       end
 
       return nil
+    end
+
+    def draw_touch_controls
+    end
+
+    def update_touch_controls
     end
 
     def resize_canvas
@@ -88,12 +113,11 @@ class AuthorEngine
         @game.scale = `window.innerHeight / 128.0`
       end
 
-      `#{@game.canvas}.width  = 128 * #{@game.scale}`
-      `#{@game.canvas}.height = 128 * #{@game.scale}`
-      `#{@game.canvas}.style.width  = 128 * #{@game.scale}`
-      `#{@game.canvas}.style.height = 128 * #{@game.scale}`
+      `#{@game.canvas}.width  = #{width}`#128 * #{@game.scale}`
+      `#{@game.canvas}.height = #{height}`#128 * #{@game.scale}`
+      `#{@game.canvas}.style.width  = #{width}`#128 * #{@game.scale}`
+      `#{@game.canvas}.style.height = #{height}`#128 * #{@game.scale}`
 
-      `#{@game.canvas_context}.scale(#{@game.scale}, #{@game.scale})`
       `#{@game.canvas_context}.imageSmoothingEnabled = false`
       return nil
     end
