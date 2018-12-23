@@ -32,9 +32,6 @@ class AuthorEngine
       @counted_frames = 0
       @frame_count_stated_at = 0
 
-      @show_touch_controls = false
-      touch_handler_setup
-
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
       resize_canvas
@@ -45,6 +42,41 @@ class AuthorEngine
       @levels.each {|level| @collision_detection.add_level(level) }
 
       @game.init
+
+      @show_touch_controls = false
+      @touch_buttons = []
+      buttons = AuthorEngine::Part::OpalInput::BUTTONS
+      key_states = AuthorEngine::Part::OpalInput::KEY_STATES
+      @touch_buttons.push(
+        TouchButton.new(
+          label: "Up", color: @game.dark_gray, x: 137, y: `window.innerHeight/2 - #{125}`, width: 50, height: 50, side: :left,
+          contact_proc: proc { key_states[buttons["up"]] = true}, no_contact_proc: proc { key_states[buttons["up"]] = false}
+        ),
+        TouchButton.new(
+          label: "Down", color: @game.dark_gray, x: 137, y: `window.innerHeight/2 + 25`, width: 50, height: 50, side: :left,
+          contact_proc: proc { key_states[buttons["down"]] = true}, no_contact_proc: proc { key_states[buttons["down"]] = false}
+        ),
+
+        TouchButton.new(
+          label: "Left", color: @game.black, x: 175, width: 50, height: 50, side: :left,
+          contact_proc: proc { key_states[buttons["left"]] = true}, no_contact_proc: proc { key_states[buttons["left"]] = false}
+        ),
+        TouchButton.new(
+          label: "Right", color: @game.black, x: 100, width: 50, height: 50, side: :left,
+          contact_proc: proc { key_states[buttons["right"]] = true}, no_contact_proc: proc { key_states[buttons["right"]] = false}
+        ),
+
+
+        TouchButton.new(
+          label: "X", color: @game.red, x: 50, width: 50, height: 50, side: :right,
+          contact_proc: proc { key_states[buttons["x"]] = true}, no_contact_proc: proc { key_states[buttons["x"]] = false}
+        ),
+        TouchButton.new(
+          label: "Y", color: @game.yellow, x: 125, width: 50, height: 50, side: :right,
+          contact_proc: proc { key_states[buttons["y"]] = true}, no_contact_proc: proc { key_states[buttons["y"]] = false}
+        )
+      )
+      touch_handler_setup
 
       return self
     end
@@ -107,20 +139,22 @@ class AuthorEngine
     end
 
     def draw_touch_controls
-      game_width = 128 * @game.scale
-      game_x     = `window.innerWidth/2 - #{game_width/2}`
-      `#{@game.canvas_context}.fillStyle = #{@game.dark_gray}`
-      `#{@game.canvas_context}.fillRect(#{game_x}-250, window.innerHeight/2 - 50, 150, 150)`
-      `#{@game.canvas_context}.fillStyle = #{@game.black}`
-      `#{@game.canvas_context}.fillRect(#{game_x}-200, window.innerHeight/2, 50, 50)`
-
-      `#{@game.canvas_context}.fillStyle = #{@game.red}`
-      `#{@game.canvas_context}.fillRect(#{game_x+game_width}+50, window.innerHeight/2, 50, 50)`
-      `#{@game.canvas_context}.fillStyle = #{@game.yellow}`
-      `#{@game.canvas_context}.fillRect(#{game_x+game_width}+150, window.innerHeight/2, 50, 50)`
+      @touch_buttons.each(&:draw)
     end
 
     def update_touch_controls
+      active_buttons = []
+
+      @touch_buttons.each do |button|
+        @current_touches.each do |id, touch|
+          if touch.x.between?(button.x, button.x+button.width) && touch.y.between?(button.y, button.y+button.height)
+            active_buttons << button
+            button.active
+          end
+        end
+      end
+
+      (@touch_buttons - active_buttons).each(&:inactive)
     end
 
     def resize_canvas
