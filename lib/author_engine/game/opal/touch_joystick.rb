@@ -1,7 +1,7 @@
 class AuthorEngine
   class TouchJoystick
-    def initialize(x:, y: nil, width:, side:)
-      @x, @y, @width, @side = x, y, width, side
+    def initialize(x:, y: nil, radius:, side:)
+      @x, @y, @radius, @side = x, y, radius, side
 
       @game       = AuthorEngine::GameRunner.instance.game
       @game_width = 128 * @game.scale
@@ -15,7 +15,7 @@ class AuthorEngine
         raise "side must be :left or :right"
       end
 
-      @y = `window.innerHeight/2 - #{height}` unless @y.is_a?(Numeric)
+      @y = `window.innerHeight/2 - #{@radius}` unless @y.is_a?(Numeric)
     end
 
     def draw

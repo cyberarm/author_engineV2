@@ -44,36 +44,14 @@ class AuthorEngine
       @game.init
 
       @show_touch_controls = false
+      @touch_joystick = TouchJoystick.new(x: 100, radius: 50, side: :left)
       @touch_buttons = []
-      buttons = AuthorEngine::Part::OpalInput::BUTTONS
-      key_states = AuthorEngine::Part::OpalInput::KEY_STATES
       @touch_buttons.push(
         TouchButton.new(
-          label: "Up", color: @game.dark_gray, x: 137, y: `window.innerHeight/2 - #{125}`, width: 50, height: 50, side: :left,
-          contact_proc: proc { key_states[buttons["up"]] = true}, no_contact_proc: proc { key_states[buttons["up"]] = false}
+          label: "X", color: @game.red, x: 50, width: 50, height: 50, side: :right, for_key: "x"
         ),
         TouchButton.new(
-          label: "Down", color: @game.dark_gray, x: 137, y: `window.innerHeight/2 + 25`, width: 50, height: 50, side: :left,
-          contact_proc: proc { key_states[buttons["down"]] = true}, no_contact_proc: proc { key_states[buttons["down"]] = false}
-        ),
-
-        TouchButton.new(
-          label: "Left", color: @game.black, x: 175, width: 50, height: 50, side: :left,
-          contact_proc: proc { key_states[buttons["left"]] = true}, no_contact_proc: proc { key_states[buttons["left"]] = false}
-        ),
-        TouchButton.new(
-          label: "Right", color: @game.black, x: 100, width: 50, height: 50, side: :left,
-          contact_proc: proc { key_states[buttons["right"]] = true}, no_contact_proc: proc { key_states[buttons["right"]] = false}
-        ),
-
-
-        TouchButton.new(
-          label: "X", color: @game.red, x: 50, width: 50, height: 50, side: :right,
-          contact_proc: proc { key_states[buttons["x"]] = true}, no_contact_proc: proc { key_states[buttons["x"]] = false}
-        ),
-        TouchButton.new(
-          label: "Y", color: @game.yellow, x: 125, width: 50, height: 50, side: :right,
-          contact_proc: proc { key_states[buttons["y"]] = true}, no_contact_proc: proc { key_states[buttons["y"]] = false}
+          label: "Y", color: @game.yellow, x: 125, width: 50, height: 50, side: :right, for_key: "y"
         )
       )
       touch_handler_setup
@@ -139,22 +117,13 @@ class AuthorEngine
     end
 
     def draw_touch_controls
+      @touch_joystick.draw
       @touch_buttons.each(&:draw)
     end
 
     def update_touch_controls
-      active_buttons = []
-
-      @touch_buttons.each do |button|
-        @current_touches.each do |id, touch|
-          if touch.x.between?(button.x, button.x+button.width) && touch.y.between?(button.y, button.y+button.height)
-            active_buttons << button
-            button.active
-          end
-        end
-      end
-
-      (@touch_buttons - active_buttons).each(&:inactive)
+      @touch_joystick.update
+      @touch_buttons.each { |button| button.trigger?(@current_touches) }
     end
 
     def resize_canvas
@@ -228,10 +197,10 @@ class AuthorEngine
       `document.addEventListener('keydown', (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = true} })`
       `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = false} })`
 
-      `#{@game.canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`); puts "Touch started..."} })`
-      `#{@game.canvas}.addEventListener('touchmove',   (event) => { #{handle_touch_move(`event`); puts "Touch moved..."} })`
-      `#{@game.canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`); puts "Touch canceled."} })`
-      `#{@game.canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`); puts "Touch Ended."} })`
+      `#{@game.canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`)} })`
+      `#{@game.canvas}.addEventListener('touchmove',   (event) => { #{handle_touch_move(`event`)} })`
+      `#{@game.canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`)} })`
+      `#{@game.canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`)} })`
 
       `document.getElementById('loading').style.display = "none"`
       `window.requestAnimationFrame(function() {#{run_game}})`
