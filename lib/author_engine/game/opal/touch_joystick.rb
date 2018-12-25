@@ -42,13 +42,9 @@ class AuthorEngine
     end
 
     def circles_collide?(x,y, radius, x2,y2, radius2)
-      dx = x2 - x
-      dy = y2 - y
       radii = radius + radius2
 
-      puts "colliding? #{Math.sqrt(dx * dx + dy * dy) < radii}", Math.sqrt(dx * dx + dy * dy), radii
-
-      if Math.sqrt(dx * dx + dy * dy) < radii
+      if @game.distance(x,y, x2,y2) < radii
         return true
       else
         return false
@@ -89,7 +85,47 @@ class AuthorEngine
         @joystick_y = @y
       end
 
+      trigger_input
+
       return nil
+    end
+
+    def trigger_input(threshold = 0.5)
+      if @joystick_x != @x || @joystick_y != @y
+        if @joystick_x > @x
+          set("right", true)
+        else
+          set("right", false)
+        end
+
+        if @joystick_x < @x
+          set("left", true)
+        else
+          set("left", false)
+        end
+
+        if @joystick_y > @y
+          set("down", true)
+        else
+          set("down", false)
+        end
+
+        if @joystick_y < @y
+          set("up", true)
+        else
+          set("up", false)
+        end
+
+      else
+        set("up", false)
+        set("down", false)
+        set("left", false)
+        set("right", false)
+      end
+    end
+
+    def set(key, boolean)
+      @key_states[@buttons[key]] = boolean
     end
   end
 end
