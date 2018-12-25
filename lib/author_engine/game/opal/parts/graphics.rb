@@ -45,7 +45,7 @@ class AuthorEngine
         _level = AuthorEngine::GameRunner.instance.levels[level]
         raise "No level at '#{index}'!" unless _level
         raise "No sprite at '#{current_sprite}'!" unless AuthorEngine::GameRunner.instance.sprites[current_sprite]
-        raise "No sprite at '#{current_sprite}'!" unless AuthorEngine::GameRunner.instance.sprites[replacement_sprite]
+        raise "No sprite at '#{replacement_sprite}'!" unless AuthorEngine::GameRunner.instance.sprites[replacement_sprite]
 
         _level.each {|sprite| sprite.sprite = replacement_sprite if sprite.sprite == current_sprite}
       end
