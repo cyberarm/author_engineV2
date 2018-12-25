@@ -20,7 +20,7 @@ class AuthorEngine
         raise "side must be :left or :right"
       end
 
-      @y = `window.innerHeight/2 - #{height}` unless @y.is_a?(Numeric)
+      @y = `window.innerHeight/2 - #{height/2}` unless @y.is_a?(Numeric)
     end
 
     def draw

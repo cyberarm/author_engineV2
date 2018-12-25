@@ -117,13 +117,13 @@ class AuthorEngine
     end
 
     def draw_touch_controls
-      @touch_joystick.draw
       @touch_buttons.each(&:draw)
+      @touch_joystick.draw
     end
 
     def update_touch_controls
-      @touch_joystick.update
       @touch_buttons.each { |button| button.trigger?(@current_touches) }
+      @touch_joystick.update(@current_touches)
     end
 
     def resize_canvas
