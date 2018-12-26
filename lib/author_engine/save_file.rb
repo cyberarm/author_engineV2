@@ -15,11 +15,12 @@ class AuthorEngine
       end
     end
 
-    attr_reader :file
+    attr_reader :file, :mode
     attr_reader :code, :sprites, :levels
     def initialize(file)
       @file = file
       @buffer = ""
+      @mode = :compact # or :inflated
 
       @code, @sprites, @levels = nil, nil, nil
 
@@ -27,6 +28,7 @@ class AuthorEngine
     end
 
     def save
+      @buffer = "# inflated\n" if inflated?
       save_code
       save_spritesheet
       save_levels
@@ -39,16 +41,58 @@ class AuthorEngine
       puts "Saved #{file}"
     end
 
-    def save_code
-      @buffer+= "___CODE___\n"
-      @buffer+= CodeEditor.instance.code
+    def inflate!
+      load
+      @mode = :inflated
+      save_code(@code)
+      save_spritesheet(Gosu::Image.new(@sprites, retro: true))
+
+      file = File.read(@file)
+      unless file.lines.first.include?("# inflated")
+        File.open(@file, "w") do |f|
+          f.write "# inflated\n"
+          f.write file
+        end
+      end
+
+    end
+
+    def inflated?
+      @mode == :inflated
+    end
+
+    def project_name
+      File.basename(@file, ".authorengine")
+    end
+
+    def project_path
+      File.expand_path(@file).sub(File.basename(@file), "")
+    end
+
+    # code is a String
+    def save_code(code = CodeEditor.instance.code)
+      if inflated?
+        @buffer+= "___CODE___?#{project_path}#{project_name}.rb\n"
+        File.write("#{project_path}#{project_name}.rb", code)
+        puts "Saved code to #{project_path}#{project_name}.rb"
+      else
+        @buffer+= "___CODE___\n"
+      end
+      @buffer+= code
       # @buffer+="\n" # CodeEditor always has this newline
     end
 
-    def save_spritesheet
-      sheet = SpriteEditor.instance.spritesheet
+    # sheet is a Gosu::Image
+    def save_spritesheet(sheet = SpriteEditor.instance.spritesheet)
 
-      @buffer+= "___SPRITES___\n"
+      if inflated?
+        @buffer+= "___SPRITES___?#{project_path}#{project_name}.png\n"
+        sheet.save("#{project_path}#{project_name}.png")
+        puts "Saved spritesheet to #{project_path}#{project_name}.png"
+      else
+        @buffer+= "___SPRITES___\n"
+      end
+
       @buffer+="#{sheet.width}x#{sheet.height}"
       @buffer+="\n"
 
@@ -78,9 +122,19 @@ class AuthorEngine
         string = data
       end
 
+      identify_mode(string)
+
       load_code(string)
       load_spritesheet(string)
       load_levels(string)
+    end
+
+    def identify_mode(string)
+      if string.lines.first.include?("# inflated")
+        @mode = :inflated
+      else
+        @mode = :compact
+      end
     end
 
     def load_code(string)
@@ -88,6 +142,12 @@ class AuthorEngine
       in_code= false
       string.each_line do |line|
         if line.start_with?("___CODE___")
+          if line.strip.include?("?")
+            # load from file
+            puts "Loading code from: #{line.strip.split("?").last}"
+            buffer = File.read(line.strip.split("?").last)
+            break
+          end
           in_code = true
           next
         end
@@ -109,6 +169,14 @@ class AuthorEngine
 
       string.each_line do |line|
         if line.strip.start_with?("___SPRITES___")
+          if line.strip.include?("?")
+            # load from file
+            puts "Loading spritesheet from: #{line.strip.split("?").last}"
+            image  = Gosu::Image.new(line.strip.split("?").last, retro: true)
+            buffer = image.to_blob
+            width, height = image.width, image.height
+            break
+          end
           in_sprites = true
           next
         end
@@ -131,7 +199,11 @@ class AuthorEngine
 
       stream = nil
       if RUBY_ENGINE != "opal"
-        stream = buffer.scan(/../).map { |x| x.hex }.pack('c*')
+        if inflated?
+          stream = buffer
+        else
+          stream = buffer.scan(/../).map { |x| x.hex }.pack('c*')
+        end
       else
         stream = buffer.scan(/../).map { |x| Integer(x.hex) }
       end
@@ -145,6 +217,12 @@ class AuthorEngine
 
       string.each_line do |line|
         if line.start_with?("___LEVELS___")
+          # if line.strip.start_with?("__LEVELS___?")
+          #   # load from file
+          #   puts "Loading level data from: #{line.strip.split("?").last}"
+
+          #   break
+          # end
           in_level = true
           next
         end
