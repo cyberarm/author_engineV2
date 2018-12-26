@@ -58,22 +58,11 @@ class AuthorEngine
         if circles_collide?(@x, @y, @radius, touch.origin_x, touch.origin_y, 1)
           touch_detected = true
 
-          @joystick_x = touch.x
-          @joystick_y = touch.y
+          _distance = @game.distance(@x,@y, touch.x,touch.y).clamp(0, @radius)
+          _direction = Math.atan2(touch.y - @y, touch.x - @x)
 
-          if @joystick_x > @x + @radius
-            @joystick_x = @x + @radius
-          elsif @joystick_x < @x - @radius
-            @joystick_x = @x - @radius
-          else
-          end
-
-          if @joystick_y > @y + @radius
-            @joystick_y = @y + @radius
-          elsif @joystick_y < @y - @radius
-            @joystick_y = @y - @radius
-          else
-          end
+          @joystick_x = @x +(_distance * Math.cos(_direction))
+          @joystick_y = @y +(_distance * Math.sin(_direction))
 
           return true
         end
@@ -91,26 +80,28 @@ class AuthorEngine
     end
 
     def trigger_input(threshold = 0.5)
+      threshold = @radius * threshold
+
       if @joystick_x != @x || @joystick_y != @y
-        if @joystick_x > @x
+        if (@x - @joystick_x) < -threshold
           set("right", true)
         else
           set("right", false)
         end
 
-        if @joystick_x < @x
+        if (@x - @joystick_x) > threshold
           set("left", true)
         else
           set("left", false)
         end
 
-        if @joystick_y > @y
+        if (@y - @joystick_y) < -threshold
           set("down", true)
         else
           set("down", false)
         end
 
-        if @joystick_y < @y
+        if (@y - @joystick_y) > threshold
           set("up", true)
         else
           set("up", false)
