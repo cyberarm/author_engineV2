@@ -26,6 +26,14 @@ class AuthorEngine
         #{@current_touches[`touches[i].identifier`] = copy_touch(`touches[i]`)}
       }`
 
+      if @fullscreen_button && @fullscreen_button.trigger?(@current_touches)
+        `if (document.fullscreenElement == null && #{@game.canvas}.requestFullscreen) {
+          #{game.canvas}.requestFullscreen()
+        } else if(document.fullscreenElement != null && document.exitFullscreen) {
+          document.exitFullscreen()
+        } `
+      end
+
       return nil
     end
 

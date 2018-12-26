@@ -1,9 +1,10 @@
 class AuthorEngine
   class TouchButton
     attr_reader :x, :y, :width, :height
-    def initialize(label:, color:, x:, y: nil, width:, height:, side:, for_key:)
+    def initialize(label:, color:, x:, y: nil, width:, height:, side:, for_key: nil, &block)
       @label, @color, @x, @y, @width, @height = label, color, x, y, width, height
       @side, @for_key = side, for_key
+      @block = block
 
       @buttons    = AuthorEngine::Part::OpalInput::BUTTONS
       @key_states = AuthorEngine::Part::OpalInput::KEY_STATES
@@ -25,13 +26,13 @@ class AuthorEngine
 
     def draw
       `#{@game.canvas_context}.fillStyle = #{@color}`
-      `#{@game.canvas_context}.fillRect(#{@x}, #{@y}, #{width}, #{width})`
+      `#{@game.canvas_context}.fillRect(#{@x}, #{@y}, #{@width}, #{@height})`
 
       font = "#{@height}px Connection, Consolas"
       `#{@game.canvas_context}.font = #{font}`
       `#{@game.canvas_context}.fillStyle = "white"`
       `#{@game.canvas_context}.textBaseline = "top"`
-      `#{@game.canvas_context}.fillText(#{@for_key.upcase}, #{@x}, #{@y}, #{width})`
+      `#{@game.canvas_context}.fillText(#{@label}, #{@x}, #{@y}, #{@width})`
     end
 
     def trigger?(touches)
@@ -44,8 +45,14 @@ class AuthorEngine
       end
 
 
-      active if triggered
-      inactive unless triggered
+      if @for_key
+        active if triggered
+        inactive unless triggered
+      else
+        @block.call if @block && triggered
+      end
+
+      return triggered
     end
 
     def active

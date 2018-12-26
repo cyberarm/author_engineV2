@@ -49,11 +49,13 @@ class AuthorEngine
       @touch_buttons.push(
         TouchButton.new(
           label: "X", color: @game.red, x: 50, width: 50, height: 50, side: :right, for_key: "x"
-        ),
+          ),
         TouchButton.new(
           label: "Y", color: @game.yellow, x: 125, width: 50, height: 50, side: :right, for_key: "y"
         )
       )
+
+      @fullscreen_button = TouchButton.new(label: "Fullscreen", color: @game.black, x: 50, y: 10, width: 100, height: 50, side: :right)
       touch_handler_setup
 
       return self
@@ -119,6 +121,7 @@ class AuthorEngine
     end
 
     def draw_touch_controls
+      @fullscreen_button.draw
       @touch_buttons.each(&:draw)
       @touch_joystick.draw
     end
@@ -126,6 +129,9 @@ class AuthorEngine
     def update_touch_controls
       @touch_buttons.each { |button| button.trigger?(@current_touches) }
       @touch_joystick.update(@current_touches)
+    end
+
+    def reposition_touch_controls
     end
 
     def resize_canvas
@@ -144,6 +150,8 @@ class AuthorEngine
       `#{@game.canvas}.style.height = #{height}`
 
       `#{@game.canvas_context}.imageSmoothingEnabled = false`
+
+      reposition_touch_controls
       return nil
     end
 
@@ -192,6 +200,10 @@ class AuthorEngine
       return nil
     end
 
+    def fullscreen_changed
+      resize_canvas
+    end
+
     def show(update_interval = (1000.0 / 60))
       return unless RUBY_ENGINE == "opal"
 
@@ -204,7 +216,10 @@ class AuthorEngine
       `#{@game.canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`)} })`
       `#{@game.canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`)} })`
 
+      `#{@game.canvas}.addEventListener('fullscreenchange',    () => { #{fullscreen_changed} })`
+
       `document.getElementById('loading').style.display = "none"`
+
       `window.requestAnimationFrame(function() {#{run_game}})`
       return nil
     end
