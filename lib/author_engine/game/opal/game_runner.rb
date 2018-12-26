@@ -73,6 +73,8 @@ class AuthorEngine
     def run_game
       `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
       `#{@game.canvas_context}.clearRect(0,0, window.innerWidth, window.innerHeight)`
+      `#{@game.canvas_context}.fillStyle = "#222"`
+      `#{@game.canvas_context}.fillRect(0,0, window.innerWidth, window.innerHeight)`
 
       @counted_frames+=1
 

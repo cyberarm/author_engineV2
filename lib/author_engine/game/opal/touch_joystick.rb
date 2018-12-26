@@ -79,7 +79,7 @@ class AuthorEngine
       return nil
     end
 
-    def trigger_input(threshold = 0.5)
+    def trigger_input(threshold = 0.35)
       threshold = @radius * threshold
 
       if @joystick_x != @x || @joystick_y != @y
