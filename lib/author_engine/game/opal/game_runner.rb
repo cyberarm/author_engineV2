@@ -208,7 +208,7 @@ class AuthorEngine
       return unless RUBY_ENGINE == "opal"
 
       `window.addEventListener('resize', () => { #{resize_canvas} })`
-      `document.addEventListener('keydown', (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = true} })`
+      `document.addEventListener('keydown', (event) => { #{@show_touch_controls = false; AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = true} })`
       `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = false} })`
 
       `#{@game.canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`)} })`

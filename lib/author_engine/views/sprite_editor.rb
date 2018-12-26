@@ -60,7 +60,11 @@ class AuthorEngine
         end
       end
 
-      import_spritesheet(window.container.savefile.sprites)
+      if window.container.savefile.sprites.to_blob.length < 4
+        import_spritesheet(spritesheet)
+      else
+        import_spritesheet(window.container.savefile.sprites)
+      end
     end
 
     def focus

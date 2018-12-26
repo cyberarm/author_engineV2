@@ -2,8 +2,17 @@ class AuthorEngine
   class Loader < Container
     Project = Struct.new(:name, :block)
     def setup
-      @root_directory = Dir.pwd#"#{Dir.home}/AuthorEngineProjects"
-      Dir.mkdir(@root_directory) unless File.exists?(@root_directory)
+      if ARGV[0] && File.exists?(ARGV[0]) && Gosu.milliseconds < 1500
+        if ARGV[0].end_with?(".authorengine")
+          load(ARGV[0])
+          return
+        elsif File.directory?(ARGV[0])
+          @root_directory = ARGV[0]
+        else
+          puts "AuthorEngine: #{ARGV[0]} is not a compatible file."
+        end
+      end
+      @root_directory ||= Dir.pwd #"#{Dir.home}/AuthorEngineProjects"
 
       @list = []
       @files = Dir.glob(@root_directory+"/*.authorengine")
@@ -27,13 +36,9 @@ class AuthorEngine
       end
       @new_button.x = window.width - @new_button.width
 
-      if ARGV[0] && File.exists?(ARGV[0])
-        if ARGV[0].end_with?(".authorengine")
-          load(ARGV[0])
-        else
-          puts "AuthorEngine: #{ARGV[0]} is not a compatible file."
-        end
-      end
+      @draw_caret = true
+      @last_caret_update = Gosu.milliseconds
+      @caret_interval = 500
     end
 
     def load(filename)
@@ -53,8 +58,23 @@ class AuthorEngine
     end
 
     def draw_inputter
+      caret_x = @font.text_width(window.text_input.text[0..window.text_input.caret_pos-1])
+      caret_x = 0 if window.text_input.caret_pos == 0
+      if Gosu.milliseconds > @last_caret_update + @caret_interval
+        @draw_caret = !@draw_caret
+        @last_caret_update = Gosu.milliseconds
+      end
+
       x = window.width/2 - @font.text_width(window.text_input.text+".authorengine")/2
+      error_x = window.width/2 - @font.text_width(window.text_input.text.strip+".authorengine already exists!")/2
       y = window.height/2 - @font.height/2
+
+      Gosu.draw_rect(x+caret_x, y, 2, @font.height, Gosu::Color::WHITE) if @draw_caret
+      if window.text_input.text.strip+".authorengine" == @name_exists
+        @font.draw_text(window.text_input.text.strip+".authorengine already exists!", error_x, y - 32, 0, 1,1, red) if @name_exists
+      else
+        @name_exists = false
+      end
       @font.draw_text(window.text_input.text+".authorengine", x, y, 0)
     end
 
@@ -100,12 +120,22 @@ class AuthorEngine
         @index = 0 if @list.size == 0
         @index = @index % @list.size-1 if @list.size != 0
       when Gosu::KbEnter, Gosu::KbReturn
+        filename = window.text_input.text.strip if window.text_input
+
         if @entering_name
-          SaveFile.create(window.text_input.text.strip+".authorengine")
-          load(window.text_input.text.strip+".authorengine")
+          if File.exists?(filename)
+            @name_exists = filename
+          else
+            window.text_input = nil
+            savefile = SaveFile.create(filename+".authorengine")
+            load(filename+".authorengine")
+          end
         else
           @list[@index].block.call if @list[@index]&.block
         end
+      when Gosu::KbEscape
+        @entering_name = false
+        window.text_input = nil
       end
     end
   end
