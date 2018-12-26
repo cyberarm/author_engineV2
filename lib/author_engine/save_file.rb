@@ -142,7 +142,7 @@ class AuthorEngine
       in_code= false
       string.each_line do |line|
         if line.start_with?("___CODE___")
-          if line.strip.include?("?")
+          if line.strip.include?("?") && inflated?
             # load from file
             puts "Loading code from: #{line.strip.split("?").last}"
             buffer = File.read(line.strip.split("?").last)
@@ -169,7 +169,7 @@ class AuthorEngine
 
       string.each_line do |line|
         if line.strip.start_with?("___SPRITES___")
-          if line.strip.include?("?")
+          if line.strip.include?("?") && inflated?
             # load from file
             puts "Loading spritesheet from: #{line.strip.split("?").last}"
             image  = Gosu::Image.new(line.strip.split("?").last, retro: true)
