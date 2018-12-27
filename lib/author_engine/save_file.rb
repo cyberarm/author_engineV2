@@ -130,7 +130,7 @@ class AuthorEngine
     end
 
     def identify_mode(string)
-      if string.lines.first.include?("# inflated")
+      if string.lines.size > 0 && string.lines.first.include?("# inflated")
         @mode = :inflated
       else
         @mode = :compact
