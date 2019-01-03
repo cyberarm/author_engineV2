@@ -63,10 +63,6 @@ body {
 
     def project
       file = File.read(@project_file)
-      if file.lines.first.include?("# inflated")
-        lines = file.lines.size
-        file = file.lines[1..lines.size-1]
-      end
 
       %{
 var projectString = `#{file}`;

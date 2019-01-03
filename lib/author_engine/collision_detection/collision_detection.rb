@@ -94,7 +94,7 @@ class AuthorEngine
     def render_bounding_box(sprite_index, box, sprite_x, sprite_y, edges = {}, z = Float::INFINITY, color = 0xc800ff00, collision_color = 0xc8ff00ff)
       if RUBY_ENGINE == "opal"
         color = "green"
-        collision_color = "red"
+        collision_color = "purple"
       end
       paint_color = color
       # EDGE: TOP

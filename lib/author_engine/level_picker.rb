@@ -54,7 +54,7 @@ class AuthorEngine
 
       @buttons << Button.new(label: ">", x: @buttons.last.x + @buttons.last.width + @offset, y: @y + @offset*2, z: 18, tooltip: "→ Next Level", color: Gosu::Color::GRAY) do
         @active_level+=1
-        @active_level = 0 if @active_level >= LevelEditor.instance.levels.size - 1
+        @active_level = 0 unless @active_level < LevelEditor.instance.levels.size
       end
     end
 
