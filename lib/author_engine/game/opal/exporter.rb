@@ -45,7 +45,7 @@ body {
   // cursor: none;
 }
 #loading {
-  font-family: Connection, sans serif;
+  font-family: Connection, sans-serif;
   color: white;
   text-align: center;
 

@@ -3,7 +3,7 @@ class AuthorEngine
     Color = Struct.new(:red, :green, :blue, :alpha)
     BoundingBox = Struct.new(:x, :y, :width, :height)
 
-    def initialize(game_sprites, game_levels)
+    def initialize(game_sprites, game_levels, spritesheet)
       @game_sprites = game_sprites
       @game_levels  = game_levels
 
@@ -11,21 +11,25 @@ class AuthorEngine
       @levels = []
 
       @known_collisions = []
+
+      if RUBY_ENGINE != "opal"
+        spritesheet.to_blob.chars.each_slice(16 * 16 * 4) do |blob|
+          add_sprite(blob)
+        end
+      else
+        spritesheet.to_blob.each_slice(16 * 16 * 4) do |blob|
+          add_sprite(blob)
+        end
+      end
+
+      @game_levels.each { |level| add_level(level) }
     end
 
     def clear
       @known_collisions.clear
     end
 
-    def add_sprite(image_or_blob)
-      blob = nil
-      if RUBY_ENGINE != "opal"
-        blob = image_or_blob.to_blob
-      else
-        blob = []
-        `#{image_or_blob}.forEach(function(value) {#{blob << `value`}})`#.each {|n| blob << n}
-      end
-
+    def add_sprite(blob)
       @sprites << {blob: blob, box: bounding_box(blob)}
     end
 

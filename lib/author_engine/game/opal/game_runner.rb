@@ -36,10 +36,8 @@ class AuthorEngine
       build_spritesheet_and_sprites_list
       resize_canvas
 
-      @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels)
+      @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels, @save_file.sprites)
       @game.collision_detection = @collision_detection
-
-      @levels.each {|level| @collision_detection.add_level(level) }
 
       @game.init
 
@@ -191,7 +189,6 @@ class AuthorEngine
         (width/size).times do |x|
           `#{temp_canvas_context}.clearRect(0,0, #{size}, #{size})`
           `#{temp_canvas_context}.drawImage(#{@spritesheet}, #{x * size}, #{y * size}, #{size}, #{size}, 0, 0, #{size}, #{size})`
-          @collision_detection.add_sprite(`#{temp_canvas_context}.getImageData(0,0, #{size}, #{size}).data`)
 
           `createImageBitmap(#{@spritesheet}, #{x * size}, #{y * size}, #{size}, #{size}).then(sprite => { #{@sprites.push(`sprite`)} })`
         end

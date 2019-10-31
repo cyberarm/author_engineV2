@@ -32,10 +32,7 @@ class AuthorEngine
         size = 16
         @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
 
-        @collision_detection = CollisionDetection.new(@sprites, @levels)
-
-        @sprites.each {|sprite| @collision_detection.add_sprite(sprite) }
-        @levels.each {|level| @collision_detection.add_level(level) }
+        @collision_detection = CollisionDetection.new(@sprites, @levels, Window.instance.container.savefile.sprites)
       end
 
       @background_color = black
