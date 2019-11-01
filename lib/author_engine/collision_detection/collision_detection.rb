@@ -12,13 +12,18 @@ class AuthorEngine
 
       @known_collisions = []
 
-      if RUBY_ENGINE != "opal"
-        spritesheet.to_blob.chars.each_slice(16 * 16 * 4) do |blob|
-          add_sprite(blob)
-        end
-      else
-        spritesheet.to_blob.each_slice(16 * 16 * 4) do |blob|
-          add_sprite(blob)
+      spritesheet_blob = RUBY_ENGINE == "opal" ? spritesheet.to_blob.each_slice(4).to_a : spritesheet.to_blob.bytes.each_slice(4).to_a
+      (spritesheet.rows / 16).times do |y|
+        (spritesheet.columns / 16).times do |x|
+          blob = []
+
+          16.times do |sy|
+            16.times do |sx|
+              blob << spritesheet_blob[(y * 16 + sy) * spritesheet.columns + (x * 16 + sx)]
+            end
+          end
+
+          add_sprite(blob.flatten!)
         end
       end
 
@@ -162,14 +167,14 @@ class AuthorEngine
     def solid_at?(blob, x, y)
       width = 16
 
-      blob[(y * width + x) * 4 + 3].ord
+      blob[(y * width + x) * 4 + 3].ord > 0
     end
 
     def bounding_box(blob, size = 16)
       box = BoundingBox.new(size, size, 0, 0)
       size.times do |y|
         size.times do |x|
-          if solid_at?(blob, x, y) > 0
+          if solid_at?(blob, x, y)
             box.x = x if x < box.x
             box.y = y if y < box.y
             box.width  = x if x > box.width
