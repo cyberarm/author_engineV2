@@ -12,27 +12,28 @@ class AuthorEngine
       include AuthorEngine::Part::GosuInput
     end
 
-    attr_accessor :scale, :canvas, :canvas_context
-    attr_accessor :collision_detection
+    attr_accessor :authorengine_scale, :authorengine_canvas, :authorengine_canvas_context
+    attr_accessor :authorengine_collision_detection
     def initialize(code:)
       if RUBY_ENGINE == "opal"
-        @scale  = 1.0
-        @canvas = `document.getElementById('canvas')`
-        @canvas_context = `#{@canvas}.getContext('2d')`
+        @authorengine_scale  = 1.0
+        @authorengine_canvas = `document.getElementById('canvas')`
+        @authorengine_canvas_context = `#{@authorengine_canvas}.getContext('2d')`
       end
 
       if RUBY_ENGINE != "opal"
-        @sprites = SpriteEditor.instance.sprites
+        @authorengine_sprites = SpriteEditor.instance.sprites
 
-        @levels = []
+        @authorengine_levels = []
         # Create a "Deep Copy" to allow for swapping of a level's sprites without corrupting LevelEditor's version
         LevelEditor.instance.levels.each do |level|
-          @levels << level.sort_by {|sprite| sprite.z}.map {|sprite| sprite.dup}
+          @authorengine_levels << level.sort_by {|sprite| sprite.z}.map {|sprite| sprite.dup}
         end
         size = 16
-        @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
+        @authorengine_levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
 
-        @collision_detection = CollisionDetection.new(@sprites, @levels, Window.instance.container.savefile.sprites)
+        spritesheet = SpriteEditor.instance.spritesheet
+        @authorengine_collision_detection = CollisionDetection.new(@authorengine_sprites, @authorengine_levels, SaveFile::SpriteSheetData.new(spritesheet.width, spritesheet.height, spritesheet.to_blob))
       end
 
       @background_color = black

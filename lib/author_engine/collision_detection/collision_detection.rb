@@ -151,13 +151,13 @@ class AuthorEngine
 
     def draw_line(x, y, x2, y2, color, z = 0)
       if RUBY_ENGINE == "opal"
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.strokeStyle = #{color}`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineWidth = 1`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.strokeStyle = #{color}`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.lineWidth = 1`
 
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.beginPath()`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.moveTo(#{x}, #{y})`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.lineTo(#{x2}, #{y2})`
-        `#{AuthorEngine::GameRunner.instance.game.canvas_context}.stroke()`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.beginPath()`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.moveTo(#{x}, #{y})`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.lineTo(#{x2}, #{y2})`
+        `#{AuthorEngine::GameRunner.instance.game.authorengine_canvas_context}.stroke()`
       else
         Gosu.draw_line(x, y, color, x2, y2, color, z)
       end

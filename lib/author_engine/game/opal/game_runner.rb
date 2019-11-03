@@ -37,7 +37,7 @@ class AuthorEngine
       resize_canvas
 
       @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels, @save_file.sprites)
-      @game.collision_detection = @collision_detection
+      @game.authorengine_collision_detection = @collision_detection
 
       @game.init
 
@@ -72,9 +72,9 @@ class AuthorEngine
 
     def run_game
       `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
-      `#{@game.canvas_context}.clearRect(0,0, window.innerWidth, window.innerHeight)`
-      `#{@game.canvas_context}.fillStyle = "#222"`
-      `#{@game.canvas_context}.fillRect(0,0, window.innerWidth, window.innerHeight)`
+      `#{@game.authorengine_canvas_context}.clearRect(0,0, window.innerWidth, window.innerHeight)`
+      `#{@game.authorengine_canvas_context}.fillStyle = "#222"`
+      `#{@game.authorengine_canvas_context}.fillRect(0,0, window.innerWidth, window.innerHeight)`
 
       @counted_frames+=1
 
@@ -86,23 +86,23 @@ class AuthorEngine
 
 
       if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
-        width = 128 * @game.scale
+        width = 128 * @game.authorengine_scale
 
-        # `#{@canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
-        `#{@game.canvas_context}.save()`
-        `#{@game.canvas_context}.translate(window.innerWidth/2 - #{width/2}, 0)`
-        `#{@game.canvas_context}.scale(#{@game.scale}, #{@game.scale})`
-        `#{@game.canvas_context}.save()`
+        # `#{@game.authorengine_canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
+        `#{@game.authorengine_canvas_context}.save()`
+        `#{@game.authorengine_canvas_context}.translate(window.innerWidth/2 - #{width/2}, 0)`
+        `#{@game.authorengine_canvas_context}.scale(#{@game.authorengine_scale}, #{@game.authorengine_scale})`
+        `#{@game.authorengine_canvas_context}.save()`
 
         region = `new Path2D()`
         `#{region}.rect(0, 0, 128, 128)`
-        `#{@game.canvas_context}.clip(#{region})`
-        `#{@game.canvas_context}.save()`
+        `#{@game.authorengine_canvas_context}.clip(#{region})`
+        `#{@game.authorengine_canvas_context}.save()`
         draw
 
-        `#{@game.canvas_context}.restore()`
-        `#{@game.canvas_context}.restore()`
-        `#{@game.canvas_context}.restore()`
+        `#{@game.authorengine_canvas_context}.restore()`
+        `#{@game.authorengine_canvas_context}.restore()`
+        `#{@game.authorengine_canvas_context}.restore()`
 
         update
 
@@ -112,7 +112,7 @@ class AuthorEngine
         end
       else
         @game.draw_background
-        @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}.", 0, @game.height/2, 8)
+        @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}...", 0, @game.height/2, 8)
       end
 
       return nil
@@ -137,17 +137,17 @@ class AuthorEngine
       height = `window.innerHeight`
 
       if width < height
-        @game.scale = `window.innerWidth / 128.0`
+        @game.authorengine_scale = `window.innerWidth / 128.0`
       else
-        @game.scale = `window.innerHeight / 128.0`
+        @game.authorengine_scale = `window.innerHeight / 128.0`
       end
 
-      `#{@game.canvas}.width  = #{width}`
-      `#{@game.canvas}.height = #{height}`
-      `#{@game.canvas}.style.width  = #{width}`
-      `#{@game.canvas}.style.height = #{height}`
+      `#{@game.authorengine_canvas}.width  = #{width}`
+      `#{@game.authorengine_canvas}.height = #{height}`
+      `#{@game.authorengine_canvas}.style.width  = #{width}`
+      `#{@game.authorengine_canvas}.style.height = #{height}`
 
-      `#{@game.canvas_context}.imageSmoothingEnabled = false`
+      `#{@game.authorengine_canvas_context}.imageSmoothingEnabled = false`
 
       reposition_touch_controls
       return nil
@@ -208,12 +208,12 @@ class AuthorEngine
       `document.addEventListener('keydown', (event) => { #{@show_touch_controls = false; AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = true} })`
       `document.addEventListener('keyup',   (event) => { #{AuthorEngine::Part::OpalInput::KEY_STATES[`event.key`] = false} })`
 
-      `#{@game.canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`)} })`
-      `#{@game.canvas}.addEventListener('touchmove',   (event) => { #{handle_touch_move(`event`)} })`
-      `#{@game.canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`)} })`
-      `#{@game.canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`)} })`
+      `#{@game.authorengine_canvas}.addEventListener('touchstart',  (event) => { #{@show_touch_controls = true; handle_touch_start(`event`)} })`
+      `#{@game.authorengine_canvas}.addEventListener('touchmove',   (event) => { #{handle_touch_move(`event`)} })`
+      `#{@game.authorengine_canvas}.addEventListener('touchcancel', (event) => { #{handle_touch_cancel(`event`)} })`
+      `#{@game.authorengine_canvas}.addEventListener('touchend',    (event) => { #{handle_touch_end(`event`)} })`
 
-      `#{@game.canvas}.addEventListener('fullscreenchange',    () => { #{fullscreen_changed} })`
+      `#{@game.authorengine_canvas}.addEventListener('fullscreenchange',    () => { #{fullscreen_changed} })`
 
       `document.getElementById('loading').style.display = "none"`
 

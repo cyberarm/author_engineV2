@@ -27,8 +27,8 @@ class AuthorEngine
       }`
 
       if @fullscreen_button && @fullscreen_button.trigger?(@current_touches)
-        `if (document.fullscreenElement == null && #{@game.canvas}.requestFullscreen) {
-          #{game.canvas}.requestFullscreen()
+        `if (document.fullscreenElement == null && #{@game.authorengine_canvas}.requestFullscreen) {
+          #{game.authorengine_canvas}.requestFullscreen()
         } else if(document.fullscreenElement != null && document.exitFullscreen) {
           document.exitFullscreen()
         } `

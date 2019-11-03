@@ -10,7 +10,7 @@ class AuthorEngine
       @key_states = AuthorEngine::Part::OpalInput::KEY_STATES
 
       @game       = AuthorEngine::GameRunner.instance.game
-      @game_width = 128 * @game.scale
+      @game_width = 128 * @game.authorengine_scale
       @game_x     = `window.innerWidth/2 - #{@game_width/2}`
 
       if @side == :left
@@ -25,14 +25,14 @@ class AuthorEngine
     end
 
     def draw
-      `#{@game.canvas_context}.fillStyle = #{@color}`
-      `#{@game.canvas_context}.fillRect(#{@x}, #{@y}, #{@width}, #{@height})`
+      `#{@game.authorengine_canvas_context}.fillStyle = #{@color}`
+      `#{@game.authorengine_canvas_context}.fillRect(#{@x}, #{@y}, #{@width}, #{@height})`
 
       font = "#{@height}px Connection, Consolas"
-      `#{@game.canvas_context}.font = #{font}`
-      `#{@game.canvas_context}.fillStyle = "white"`
-      `#{@game.canvas_context}.textBaseline = "top"`
-      `#{@game.canvas_context}.fillText(#{@label}, #{@x}, #{@y}, #{@width})`
+      `#{@game.authorengine_canvas_context}.font = #{font}`
+      `#{@game.authorengine_canvas_context}.fillStyle = "white"`
+      `#{@game.authorengine_canvas_context}.textBaseline = "top"`
+      `#{@game.authorengine_canvas_context}.fillText(#{@label}, #{@x}, #{@y}, #{@width})`
     end
 
     def trigger?(touches)

@@ -116,17 +116,13 @@ class AuthorEngine
     end
 
     def move_viewport
-      if window.button_down?(Gosu::KbUp)
-        @viewport_y += 1 * @scale
-      elsif window.button_down?(Gosu::KbDown)
-        @viewport_y -= 1 * @scale
-      elsif window.button_down?(Gosu::KbLeft)
-        @viewport_x += 1 * @scale
-      elsif window.button_down?(Gosu::KbRight)
-        @viewport_x -= 1 * @scale
-      elsif window.button_down?(Gosu::Kb0)
-        @viewport_x, @viewport_y = 0, 0
-      end
+      @viewport_y += 1 * @scale if window.button_down?(Gosu::KbUp)
+      @viewport_y -= 1 * @scale if window.button_down?(Gosu::KbDown)
+
+      @viewport_x += 1 * @scale if window.button_down?(Gosu::KbLeft)
+      @viewport_x -= 1 * @scale if window.button_down?(Gosu::KbRight)
+
+      @viewport_x, @viewport_y = 0, 0 if window.button_down?(Gosu::Kb0)
     end
 
     def normalize(int)

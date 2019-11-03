@@ -27,11 +27,15 @@ class AuthorEngine
         Math.sqrt(dx * dx + dy * dy)
       end
 
+      def levels
+        @authorengine_levels ? @authorengine_levels : AuthorEngine::GameRunner.instance.levels
+      end
+
       # returns number of milliseconds since game started
       def milliseconds
         if RUBY_ENGINE == "opal"
           @__initial_milliseconds ||= `performance.now()`
-          (`performance.now()` - @__initial_milliseconds).round(3)
+          (`performance.now()` - @__initial_milliseconds)
         else
           Gosu.milliseconds
         end

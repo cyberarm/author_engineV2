@@ -7,7 +7,7 @@ class AuthorEngine
       @key_states = AuthorEngine::Part::OpalInput::KEY_STATES
 
       @game       = AuthorEngine::GameRunner.instance.game
-      @game_width = 128 * @game.scale
+      @game_width = 128 * @game.authorengine_scale
       @game_x     = `window.innerWidth/2 - #{@game_width/2}`
 
       if @side == :left
@@ -27,16 +27,16 @@ class AuthorEngine
 
     def draw
       # Background
-      `#{@game.canvas_context}.fillStyle = #{@background}`
-      `#{@game.canvas_context}.beginPath()`
-      `#{@game.canvas_context}.arc(#{@x}, #{@y}, #{@radius}, 0, 2 * Math.PI)`
-      `#{@game.canvas_context}.fill()`
+      `#{@game.authorengine_canvas_context}.fillStyle = #{@background}`
+      `#{@game.authorengine_canvas_context}.beginPath()`
+      `#{@game.authorengine_canvas_context}.arc(#{@x}, #{@y}, #{@radius}, 0, 2 * Math.PI)`
+      `#{@game.authorengine_canvas_context}.fill()`
 
       # Joystick
-      `#{@game.canvas_context}.beginPath()`
-      `#{@game.canvas_context}.fillStyle = #{@color}`
-      `#{@game.canvas_context}.arc(#{@joystick_x}, #{@joystick_y}, #{@joystick_radius}, 0, 2 * Math.PI)`
-      `#{@game.canvas_context}.fill()`
+      `#{@game.authorengine_canvas_context}.beginPath()`
+      `#{@game.authorengine_canvas_context}.fillStyle = #{@color}`
+      `#{@game.authorengine_canvas_context}.arc(#{@joystick_x}, #{@joystick_y}, #{@joystick_radius}, 0, 2 * Math.PI)`
+      `#{@game.authorengine_canvas_context}.fill()`
 
       return nil
     end

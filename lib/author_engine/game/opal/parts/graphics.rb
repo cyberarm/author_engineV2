@@ -2,8 +2,8 @@ class AuthorEngine
   class Part
     module OpalGraphics
       def rect(x = 0, y = 0, width = 1, height = 1, color = "white", z = 0)
-        `#{@canvas_context}.fillStyle = #{color}`
-        `#{@canvas_context}.fillRect(#{x}, #{y}, #{width}, #{height})`
+        `#{@authorengine_canvas_context}.fillStyle = #{color}`
+        `#{@authorengine_canvas_context}.fillRect(#{x}, #{y}, #{width}, #{height})`
         return nil
       end
 
@@ -11,25 +11,25 @@ class AuthorEngine
         size = 16 # sprite size
         sprites = AuthorEngine::GameRunner.instance.sprites
 
-        `#{@canvas_context}.save()`
+        `#{@authorengine_canvas_context}.save()`
         if alpha <= 0
           alpha = 0
         else
           alpha = (alpha / 255.0)
         end
-        `#{@canvas_context}.globalAlpha = #{alpha}`
+        `#{@authorengine_canvas_context}.globalAlpha = #{alpha}`
 
-        `#{@canvas_context}.drawImage(#{sprites[sprite_sheet_index]}, #{x}, #{y})`
+        `#{@authorengine_canvas_context}.drawImage(#{sprites[sprite_sheet_index]}, #{x}, #{y})`
 
-        `#{@canvas_context}.restore()`
+        `#{@authorengine_canvas_context}.restore()`
       end
 
       def text(string, x = 0, y = 0, size = 4, z = 0, color = "white")
         font = "#{size}px Connection, Consolas"
-        `#{@canvas_context}.font = #{font}`
-        `#{@canvas_context}.fillStyle = #{color}`
-        `#{@canvas_context}.textBaseline = "top"`
-        `#{@canvas_context}.fillText(#{string}, #{x}, #{y})`
+        `#{@authorengine_canvas_context}.font = #{font}`
+        `#{@authorengine_canvas_context}.fillStyle = #{color}`
+        `#{@authorengine_canvas_context}.textBaseline = "top"`
+        `#{@authorengine_canvas_context}.fillText(#{string}, #{x}, #{y})`
       end
 
       def level(index, z = 0)
@@ -51,18 +51,18 @@ class AuthorEngine
       end
 
       def translate(x, y, &block)
-        `#{@canvas_context}.save()`
-        `#{@canvas_context}.translate(#{x}, #{y})`
+        `#{@authorengine_canvas_context}.save()`
+        `#{@authorengine_canvas_context}.translate(#{x}, #{y})`
         block.call if block
-        `#{@canvas_context}.restore()`
+        `#{@authorengine_canvas_context}.restore()`
       end
 
       def rotate(angle, x = 0, y = 0, &block)
-        `#{@canvas_context}.save()`
-        `#{@canvas_context}.translate(#{x}, #{y})`
-        `#{@canvas_context}.rotate(#{angle})`
+        `#{@authorengine_canvas_context}.save()`
+        `#{@authorengine_canvas_context}.translate(#{x}, #{y})`
+        `#{@authorengine_canvas_context}.rotate(#{angle})`
         block.call if block
-        `#{@canvas_context}.restore()`
+        `#{@authorengine_canvas_context}.restore()`
       end
     end
   end
