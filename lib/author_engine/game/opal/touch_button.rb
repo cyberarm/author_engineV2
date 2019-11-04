@@ -1,9 +1,10 @@
 class AuthorEngine
   class TouchButton
-    attr_reader :x, :y, :width, :height
-    def initialize(label:, color:, x:, y: nil, width:, height:, side:, for_key: nil, &block)
+    attr_accessor :x, :y
+    attr_reader :width, :height
+    def initialize(label:, color:, x: 0, y: 0, width:, height:, for_key: nil, &block)
       @label, @color, @x, @y, @width, @height = label, color, x, y, width, height
-      @side, @for_key = side, for_key
+      @for_key = for_key
       @block = block
 
       @buttons    = AuthorEngine::Part::OpalInput::BUTTONS
@@ -12,16 +13,6 @@ class AuthorEngine
       @game       = AuthorEngine::GameRunner.instance.game
       @game_width = 128 * @game.authorengine_scale
       @game_x     = `window.innerWidth/2 - #{@game_width/2}`
-
-      if @side == :left
-        @x = @game_x-@x
-      elsif @side == :right
-        @x = @game_x+@game_width+@x
-      else
-        raise "side must be :left or :right"
-      end
-
-      @y = `window.innerHeight/2 - #{height/2}` unless @y.is_a?(Numeric)
     end
 
     def draw

@@ -1,5 +1,6 @@
 require "opal"
 require "fileutils"
+require_relative "../../version"
 
 class AuthorEngine
   class OpalExporter
@@ -14,7 +15,7 @@ class AuthorEngine
       return name.split("_").map {|n| n.capitalize}.join(" ")
     end
 
-    # Rebuild opal runtime of it doesn't exist or if its out of date
+    # Rebuild opal runtime if it doesn't exist or if its out of date
     def build_opal?
       opal_runtime = "#{export_directory}/js/runtime.js"
 
@@ -24,6 +25,21 @@ class AuthorEngine
         file.close
 
         Opal::VERSION != version
+      else
+        true
+      end
+    end
+
+    # Rebuild author_engine runtime if it doesn't exist or if its out of date
+    def build_authorengine?
+      authorengine_runtime = "#{export_directory}/js/author_engine.js"
+
+      if File.exists?(authorengine_runtime)
+        file = File.open(authorengine_runtime)
+        version = file.first.gsub("/", "").strip
+        file.close
+
+        AuthorEngine::VERSION != version
       else
         true
       end
@@ -42,7 +58,7 @@ body {
 #canvas {
   display: block;
   margin: 0 auto;
-  // cursor: none;
+  cursor: none;
 }
 #loading {
   font-family: Connection, sans-serif;
@@ -71,8 +87,6 @@ var projectString = `#{file}`;
 
     def game_runtime
       program = %{
-# require "opal"
-# require "opal-parser"
 require "author_engine/opal"
 
 `var callback = function(){
@@ -99,22 +113,31 @@ if (
         opal_builder.build("opal")
         opal_builder.build("opal-parser")
       else
-        puts "  Skipping Opal runtime. Already exists as v#{Opal::VERSION}..."
+        puts "  Skipping Opal runtime. Already exists and up to date (v#{Opal::VERSION})..."
       end
 
-      puts "  Building AuthorEngine runtime with project..."
-      game_builder = Opal::Builder.new
-      base_path = File.expand_path("../../../..", __FILE__)
-      game_builder.append_paths("#{base_path}")
+      author_engine_builder = nil
+      if build_authorengine?
+        puts "  Building AuthorEngine runtime..."
 
-      game_builder.build_require("author_engine/opal")
+        author_engine_builder = Opal::Builder.new
+        base_path = File.expand_path("../../../..", __FILE__)
+        author_engine_builder.append_paths("#{base_path}")
+
+        author_engine_builder.build_require("author_engine/opal")
+      else
+        puts "  Skipping AuthorEngine runtime. Already exists and up to date (v#{AuthorEngine::VERSION})..."
+      end
 
       opal_builder_js  = nil
       if opal_builder
         opal_runtime_js = opal_builder.build_str("", "(inline)").to_s
       end
 
-      author_engine_js = game_builder.build_str(program, "(inline)").to_s
+      author_engine_js = nil
+      if author_engine_builder
+        author_engine_js = author_engine_builder.build_str(program, "(inline)").to_s
+      end
 
       return {opal_runtime: opal_runtime_js, author_engine_runtime: author_engine_js}
     end
@@ -124,6 +147,7 @@ if (
 <!doctype html5>
 <html>
   <head>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta charset="utf-8" />
     <title>#{project_name} | AuthorEngine</title>
   </head>
@@ -201,12 +225,16 @@ if (
         end
       end
 
+      puts "  Building game..."
       File.open("#{export_path}/game.js", "w") do |file|
         file.write(project)
       end
 
-      File.open("#{export_path}/js/author_engine.js", "w") do |file|
-        file.write(hash[:author_engine_runtime])
+      if hash[:author_engine_runtime]
+        File.open("#{export_path}/js/author_engine.js", "w") do |file|
+          file.write("// #{AuthorEngine::VERSION}\n")
+          file.write(hash[:author_engine_runtime])
+        end
       end
 
       fonts_path = "#{File.expand_path("../../../../../", __FILE__)}/assets/fonts"

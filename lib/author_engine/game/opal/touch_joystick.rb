@@ -1,7 +1,8 @@
 class AuthorEngine
   class TouchJoystick
-    def initialize(x:, y: nil, radius:, side:, background: nil, color: nil)
-      @x, @y, @radius, @side, @background, @color = x, y, radius, side, background, color
+    attr_accessor :x, :y, :radius
+    def initialize(x: 0, y: 0, radius:, background: nil, color: nil)
+      @x, @y, @radius, @background, @color = x, y, radius, background, color
 
       @buttons    = AuthorEngine::Part::OpalInput::BUTTONS
       @key_states = AuthorEngine::Part::OpalInput::KEY_STATES
@@ -10,15 +11,6 @@ class AuthorEngine
       @game_width = 128 * @game.authorengine_scale
       @game_x     = `window.innerWidth/2 - #{@game_width/2}`
 
-      if @side == :left
-        @x = @game_x-@x
-      elsif @side == :right
-        @x = @game_x+@game_width+@x
-      else
-        raise "side must be :left or :right"
-      end
-
-      @y = `window.innerHeight/2` unless @y.is_a?(Numeric)
       @color = @game.dark_gray unless @color
       @background = @game.light_gray unless @background
 
@@ -26,6 +18,10 @@ class AuthorEngine
     end
 
     def draw
+      #Clear
+      combo = @radius + @joystick_radius
+      `#{@game.authorengine_canvas_context}.clearRect(#{@x - combo}, #{@y - combo}, #{combo + combo}, #{combo + combo})`
+
       # Background
       `#{@game.authorengine_canvas_context}.fillStyle = #{@background}`
       `#{@game.authorengine_canvas_context}.beginPath()`

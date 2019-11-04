@@ -34,7 +34,6 @@ class AuthorEngine
 
       @game = Game.new(code: @save_file.code)
       build_spritesheet_and_sprites_list
-      resize_canvas
 
       @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels, @save_file.sprites)
       @game.authorengine_collision_detection = @collision_detection
@@ -42,19 +41,20 @@ class AuthorEngine
       @game.init
 
       @show_touch_controls = false
-      @touch_joystick = TouchJoystick.new(x: 100, radius: 50, side: :left)
+      @touch_joystick = TouchJoystick.new(radius: 50)
       @touch_buttons = []
       @touch_buttons.push(
         TouchButton.new(
-          label: "X", color: @game.red, x: 50, width: 50, height: 50, side: :right, for_key: "x"
+          label: "X", color: @game.red, width: 50, height: 50, for_key: "x"
           ),
         TouchButton.new(
-          label: "Y", color: @game.yellow, x: 125, width: 50, height: 50, side: :right, for_key: "y"
+          label: "Y", color: @game.yellow, width: 50, height: 50, for_key: "y"
         )
       )
 
-      @fullscreen_button = TouchButton.new(label: "Fullscreen", color: @game.black, x: 50, y: 10, width: 100, height: 50, side: :right)
+      @fullscreen_button = TouchButton.new(label: "Fullscreen", color: @game.black, width: 100, height: 50)
       touch_handler_setup
+      resize_canvas
 
       return self
     end
@@ -72,9 +72,14 @@ class AuthorEngine
 
     def run_game
       `window.requestAnimationFrame(function() {#{run_game}})` # placed here to ensure next frame is called even if draw or update throw an error
-      `#{@game.authorengine_canvas_context}.clearRect(0,0, window.innerWidth, window.innerHeight)`
-      `#{@game.authorengine_canvas_context}.fillStyle = "#222"`
-      `#{@game.authorengine_canvas_context}.fillRect(0,0, window.innerWidth, window.innerHeight)`
+      width  = `window.innerWidth`
+      height = `window.innerHeight`
+      game_width = 128 * @game.authorengine_scale
+      game_height = 128 * @game.authorengine_scale
+
+      area_width  = (`window.innerWidth` - game_width) / 2
+
+      `#{@game.authorengine_canvas_context}.clearRect(#{area_width},0, #{game_width}, #{game_height})`
 
       @counted_frames+=1
 
@@ -86,11 +91,9 @@ class AuthorEngine
 
 
       if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
-        width = 128 * @game.authorengine_scale
-
         # `#{@game.authorengine_canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
         `#{@game.authorengine_canvas_context}.save()`
-        `#{@game.authorengine_canvas_context}.translate(window.innerWidth/2 - #{width/2}, 0)`
+        `#{@game.authorengine_canvas_context}.translate(window.innerWidth/2 - #{game_height/2}, 0)`
         `#{@game.authorengine_canvas_context}.scale(#{@game.authorengine_scale}, #{@game.authorengine_scale})`
         `#{@game.authorengine_canvas_context}.save()`
 
@@ -130,6 +133,59 @@ class AuthorEngine
     end
 
     def reposition_touch_controls
+      return nil unless @touch_joystick
+
+      width  = `window.innerWidth`
+      height = `window.innerHeight`
+      game_width = 128 * @game.authorengine_scale
+      game_height = 128 * @game.authorengine_scale
+
+      # place controls under game
+      if width < height
+        area_width  = width
+        area_height = height - game_height
+
+        puts "space: width #{area_width} x height #{area_height}"
+
+        @touch_joystick.x = @touch_joystick.radius + @touch_joystick.radius
+        @touch_joystick.y = game_height + area_height / 2
+
+        padding = 10
+        last_x = 20
+        @touch_buttons.reverse.each do |button|
+          button.x = width - (last_x + button.width)
+          button.y = (height - area_height) + area_height / 2 - button.height / 2
+
+          last_x += button.width + padding
+        end
+
+        @fullscreen_button.x = width - (width / 2 + @fullscreen_button.width / 2)
+        @fullscreen_button.y = height - @fullscreen_button.height
+
+      # place controls beside game
+      else
+        area_width  = (`window.innerWidth` - game_width) / 2
+        area_height = game_height
+
+        puts "space: width #{area_width} x height #{area_height}"
+
+        @touch_joystick.x = @touch_joystick.radius + @touch_joystick.radius
+        @touch_joystick.y = game_height / 2
+
+        padding = 10
+        last_x = 50
+        @touch_buttons.reverse.each do |button|
+          button.x = width - (last_x + button.width)
+          button.y = game_height / 2 - button.height / 2
+
+          last_x += button.width + padding
+        end
+
+        @fullscreen_button.x = width - @fullscreen_button.width
+        @fullscreen_button.y = 0
+      end
+
+      return nil
     end
 
     def resize_canvas
@@ -137,9 +193,9 @@ class AuthorEngine
       height = `window.innerHeight`
 
       if width < height
-        @game.authorengine_scale = `window.innerWidth / 128.0`
+        @game.authorengine_scale = `#{width} / 128.0`
       else
-        @game.authorengine_scale = `window.innerHeight / 128.0`
+        @game.authorengine_scale = `#{height} / 128.0`
       end
 
       `#{@game.authorengine_canvas}.width  = #{width}`
@@ -150,6 +206,7 @@ class AuthorEngine
       `#{@game.authorengine_canvas_context}.imageSmoothingEnabled = false`
 
       reposition_touch_controls
+      `#{@game.authorengine_canvas_context}.clearRect(0, 0, window.innerWidth, window.innerHeight)`
       return nil
     end
 
