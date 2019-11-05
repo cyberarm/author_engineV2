@@ -30,6 +30,8 @@ class AuthorEngine
 
       @close_counter = 0
 
+      @cursor = AuthorEngine::Image.new("assets/ui/cursor.png", retro: true)
+
       calculate_scale
       setup
     end
@@ -56,14 +58,11 @@ class AuthorEngine
 
     def draw
       @container.draw
+      @cursor.draw(mouse_x, mouse_y, Float::INFINITY, @square_scale, @square_scale) if @show_cursor
     end
 
     def update
       @container.update
-    end
-
-    def needs_cursor?
-      @show_cursor
     end
 
     def lighten(color, amount = 25)
