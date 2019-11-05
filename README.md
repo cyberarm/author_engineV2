@@ -22,7 +22,7 @@ A virtual console¹ that you code in Ruby.
 ## Sprite Editor
 ![sprite_editor_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/sprite_editor.png)
 ## Level Editor
-![level_editor_view](#)
+![level_editor_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/level_editor.png)
 ## Code Editor
 ![code_editor_view](https://raw.githubusercontent.com/cyberarm/author_engineV2/master/screenshots/code_editor.png)
 
