@@ -17,44 +17,88 @@ class AuthorEngine
       @save_file = AuthorEngine::SaveFile.new(nil)
       @save_file.load(false, project_string)
 
-      size = 16
-
-      @levels  = @save_file.levels
-      @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * size; sprite.y = sprite.y * size}}
-
       @sprites = []
       @spritesheet = nil
       @spritesheet_width  = @save_file.sprites.columns
       @spritesheet_height = @save_file.sprites.rows
       @sprite_size = 16
 
+      @game = Game.new(code: @save_file.code)
+      resize_canvas
+
       @fps = 0
       @counted_frames = 0
       @frame_count_stated_at = 0
 
-      @game = Game.new(code: @save_file.code)
-      build_spritesheet_and_sprites_list
-
-      @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels, @save_file.sprites)
-      @game.authorengine_collision_detection = @collision_detection
-
-      @game.init
-
       @show_touch_controls = false
-      @touch_joystick = TouchJoystick.new(radius: 50)
-      @touch_buttons = []
-      @touch_buttons.push(
-        TouchButton.new(
-          label: "X", color: @game.red, width: 50, height: 50, for_key: "x"
-          ),
-        TouchButton.new(
-          label: "Y", color: @game.yellow, width: 50, height: 50, for_key: "y"
-        )
-      )
 
-      @fullscreen_button = TouchButton.new(label: "Fullscreen", color: @game.black, width: 100, height: 50)
-      touch_handler_setup
-      resize_canvas
+      @game_loaded = false
+
+      @loader_tasks = [
+        [
+          "Loading levels",
+          proc {
+            @levels  = @save_file.levels
+            @levels.each {|level| level.each {|sprite| sprite.x = sprite.x * @sprite_size; sprite.y = sprite.y * @sprite_size}}
+          }
+        ],
+
+        [
+          "Evaluating game",
+          proc {
+            @game.authorengine_eval_code
+          },
+        ],
+
+        [
+          "Loading sprites",
+          proc {
+            build_spritesheet_and_sprites_list
+          },
+        ],
+
+        [
+          "Setting up collision detection",
+          proc {
+            @collision_detection = AuthorEngine::CollisionDetection.new(@sprites, @levels, @save_file.sprites)
+            @game.authorengine_collision_detection = @collision_detection
+          },
+        ],
+
+        [
+          "Initializing game",
+          proc {
+            @game.init
+          },
+        ],
+
+        [
+          "Setting up touch controls",
+          proc {
+            @touch_joystick = TouchJoystick.new(radius: 50)
+            @touch_buttons = []
+            @touch_buttons.push(
+              TouchButton.new(
+                label: "X", color: @game.red, width: 50, height: 50, for_key: "x"
+                ),
+              TouchButton.new(
+                label: "Y", color: @game.yellow, width: 50, height: 50, for_key: "y"
+              )
+            )
+
+            @fullscreen_button = TouchButton.new(label: "Fullscreen", color: @game.black, width: 100, height: 50)
+            touch_handler_setup
+            reposition_touch_controls
+          },
+        ],
+
+        [
+          "Loading done",
+          proc {
+            @game_loaded = true
+          },
+        ],
+      ]
 
       return self
     end
@@ -89,20 +133,19 @@ class AuthorEngine
         @counted_frames = 0
       end
 
+      `#{@game.authorengine_canvas_context}.save()`
+      `#{@game.authorengine_canvas_context}.translate(window.innerWidth/2 - #{game_height/2}, 0)`
+      `#{@game.authorengine_canvas_context}.scale(#{@game.authorengine_scale}, #{@game.authorengine_scale})`
+      `#{@game.authorengine_canvas_context}.save()`
 
-      if @sprites.size == (@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)
-        # `#{@game.authorengine_canvas_context}.setTransform(1, 0, 0, 1, 0, 0)`
-        `#{@game.authorengine_canvas_context}.save()`
-        `#{@game.authorengine_canvas_context}.translate(window.innerWidth/2 - #{game_height/2}, 0)`
-        `#{@game.authorengine_canvas_context}.scale(#{@game.authorengine_scale}, #{@game.authorengine_scale})`
-        `#{@game.authorengine_canvas_context}.save()`
+      region = `new Path2D()`
+      `#{region}.rect(0, 0, 128, 128)`
+      `#{@game.authorengine_canvas_context}.clip(#{region})`
+      `#{@game.authorengine_canvas_context}.save()`
 
-        region = `new Path2D()`
-        `#{region}.rect(0, 0, 128, 128)`
-        `#{@game.authorengine_canvas_context}.clip(#{region})`
-        `#{@game.authorengine_canvas_context}.save()`
+
+      if @game_loaded or @loader_tasks.empty?
         draw
-
         `#{@game.authorengine_canvas_context}.restore()`
         `#{@game.authorengine_canvas_context}.restore()`
         `#{@game.authorengine_canvas_context}.restore()`
@@ -113,9 +156,19 @@ class AuthorEngine
           draw_touch_controls
           update_touch_controls
         end
+
       else
-        @game.draw_background
-        @game.text("Loading sprite #{@sprites.size}/#{(@spritesheet_width/@sprite_size)*(@spritesheet_height/@sprite_size)}...", 0, @game.height/2, 8)
+        task = @loader_tasks.shift
+        @game.rect(0, 0, @game.width, @game.height, @game.dark_purple)
+        @game.text("AuthorEngine v#{AuthorEngine::VERSION}", 2, @game.height / 2 - 20, 10)
+        @game.text("#{task[0]}...", 6, @game.height / 2 - 4, 8, 0, @game.light_gray)
+        @game.text("Empowered by Opal v#{Opal::VERSION}, a Ruby interpeter.", 4, @game.height - 6, 4, 0, @game.indigo)
+
+        `#{@game.authorengine_canvas_context}.restore()`
+        `#{@game.authorengine_canvas_context}.restore()`
+        `#{@game.authorengine_canvas_context}.restore()`
+
+        task[1].call
       end
 
       return nil

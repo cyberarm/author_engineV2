@@ -15,21 +15,6 @@ class AuthorEngine
       return name.split("_").map {|n| n.capitalize}.join(" ")
     end
 
-    # Rebuild opal runtime if it doesn't exist or if its out of date
-    def build_opal?
-      opal_runtime = "#{export_directory}/js/runtime.js"
-
-      if File.exists?(opal_runtime)
-        file = File.open(opal_runtime)
-        version = file.first.gsub("/", "").strip
-        file.close
-
-        Opal::VERSION != version
-      else
-        true
-      end
-    end
-
     # Rebuild author_engine runtime if it doesn't exist or if its out of date
     def build_authorengine?
       authorengine_runtime = "#{export_directory}/js/author_engine.js"
@@ -85,7 +70,7 @@ var projectString = `#{file}`;
       }
     end
 
-    def game_runtime
+    def author_engine_runtime
       program = %{
 require "author_engine/opal"
 
@@ -105,17 +90,6 @@ if (
 
       puts "Transpiling to JavaScript using Opal..."
 
-      opal_builder = nil
-      if build_opal?
-        puts "  Building Opal runtime..."
-
-        opal_builder = Opal::Builder.new
-        opal_builder.build("opal")
-        opal_builder.build("opal-parser")
-      else
-        puts "  Skipping Opal runtime. Already exists and up to date (v#{Opal::VERSION})..."
-      end
-
       author_engine_builder = nil
       if build_authorengine?
         puts "  Building AuthorEngine runtime..."
@@ -129,17 +103,12 @@ if (
         puts "  Skipping AuthorEngine runtime. Already exists and up to date (v#{AuthorEngine::VERSION})..."
       end
 
-      opal_builder_js  = nil
-      if opal_builder
-        opal_runtime_js = opal_builder.build_str("", "(inline)").to_s
-      end
-
       author_engine_js = nil
       if author_engine_builder
         author_engine_js = author_engine_builder.build_str(program, "(inline)").to_s
       end
 
-      return {opal_runtime: opal_runtime_js, author_engine_runtime: author_engine_js}
+      return author_engine_js
     end
 
     def template
@@ -164,19 +133,30 @@ if (
     <script>
       // Add a small delay before loading application in order to finish loading page and show "Loading..."
       window.setTimeout(function() {
-        console.log("Loading Opal runtime...");
+        console.log("Loading Opal...");
 
-        var opal_runtime = document.createElement('script');
-        opal_runtime.onload = function() {
-          console.log("Loading AuthorEngine runtime...");
+        var opal = document.createElement('script');
+        opal.onload = function() {
+          console.log("Loading Opal Parser...");
 
-          var author_engine_runtime = document.createElement('script');
-          author_engine_runtime.src = "js/author_engine.js";
-          document.head.appendChild(author_engine_runtime);
+          var opal_parser = document.createElement('script');
+          opal_parser.onload = function() {
+            Opal.load('opal-parser');
+
+            console.log("Loading AuthorEngine runtime...");
+
+            var author_engine_runtime = document.createElement('script');
+            author_engine_runtime.src = "js/author_engine.js";
+
+            document.head.appendChild(author_engine_runtime);
+          }
+          opal_parser.src = "js/opal-parser.min.js";
+
+          document.head.appendChild(opal_parser);
         }
-        opal_runtime.src = "js/runtime.js";
+        opal.src = "js/opal.min.js";
 
-        document.head.appendChild(opal_runtime);
+        document.head.appendChild(opal);
       }, 500);
     </script>
   </body>
@@ -217,23 +197,18 @@ if (
         file.write(string)
       end
 
-      hash = game_runtime
-      if hash[:opal_runtime]
-        File.open("#{export_path}/js/runtime.js", "w") do |file|
-          file.write("// #{Opal::VERSION}\n")
-          file.write(hash[:opal_runtime])
-        end
-      end
+      local = File.expand_path("../../../../../vendor", __FILE__)
+      FileUtils.cp(["#{local}/opal.min.js", "#{local}/opal.min.js"], "#{export_directory}/js")
 
       puts "  Building game..."
       File.open("#{export_path}/game.js", "w") do |file|
         file.write(project)
       end
 
-      if hash[:author_engine_runtime]
+      if runtime = author_engine_runtime
         File.open("#{export_path}/js/author_engine.js", "w") do |file|
           file.write("// #{AuthorEngine::VERSION}\n")
-          file.write(hash[:author_engine_runtime])
+          file.write(runtime)
         end
       end
 

@@ -15,6 +15,8 @@ class AuthorEngine
     attr_accessor :authorengine_scale, :authorengine_canvas, :authorengine_canvas_context
     attr_accessor :authorengine_collision_detection
     def initialize(code:)
+      @authorengine_code = code
+
       if RUBY_ENGINE == "opal"
         @authorengine_scale  = 1.0
         @authorengine_canvas = `document.getElementById('canvas')`
@@ -34,10 +36,15 @@ class AuthorEngine
 
         spritesheet = SpriteEditor.instance.spritesheet
         @authorengine_collision_detection = CollisionDetection.new(@authorengine_sprites, @authorengine_levels, SaveFile::SpriteSheetData.new(spritesheet.width, spritesheet.height, spritesheet.to_blob))
+
+        self.instance_eval(code)
       end
 
       @background_color = black
-      self.instance_eval(code)
+    end
+
+    def authorengine_eval_code
+      self.instance_eval(@authorengine_code)
     end
 
     def draw_background

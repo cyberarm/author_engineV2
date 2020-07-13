@@ -1,5 +1,6 @@
 raise "Only require \"author_engine/opal\" with Opal!" unless RUBY_ENGINE == "opal"
 
+require_relative "version"
 require_relative "game/common/parts/common"
 require_relative "game/common/parts/collision_detection"
 require_relative "game/common/parts/colors"
